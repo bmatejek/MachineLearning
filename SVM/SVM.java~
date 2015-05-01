@@ -1,0 +1,13 @@
+public class NeuralNetwork implements Learner {
+  // constructor for NaiveBayes
+  public NeuralNetwork() { 
+  }
+  
+  // train on a dataset
+  public void Train() { 
+  }
+  
+  // classify a particular data
+  public void Classify() {
+  }
+}
