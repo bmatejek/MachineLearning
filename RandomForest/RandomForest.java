@@ -1,13 +1,15 @@
 public class RandomForest implements Learner {
-  // constructor for RandomForest
-  public RandomForest() { 
-  }
+  private final int print_verbose;
   
-  // train on a dataset
-  public void Train(DataSet train) { 
+  // constructor for RandomForest
+  public RandomForest(DataSet train, int print_verbose) { 
+    this.print_verbose = print_verbose;
+    
+    // train on the DataSet
   }
   
   // classify a particular data
-  public void Classify(DataPoint test) {
+  public int[] Classify(DataSet test) {
+    return new int[0];
   }
 }

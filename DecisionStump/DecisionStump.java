@@ -1,13 +1,14 @@
 public class DecisionStump implements Learner {
+  private final int print_verbose;
+  
   // constructor for DecisionStump
-  public DecisionStump() { 
+  public DecisionStump(DataSet train, int print_verbose) { 
+    this.print_verbose = print_verbose;
+    
+    // train on the DataSet
   }
-  
-  // train on a dataset
-  public void Train(DataSet train) { 
-  }
-  
   // classify a particular data
-  public void Classify(DataPoint point) {
+  public int[] Classify(DataSet test) {
+    return new int[0];
   }
 }

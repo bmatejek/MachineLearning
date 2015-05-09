@@ -1,13 +1,14 @@
 public class NaiveBayes implements Learner {
+  private final int print_verbose;
+  
   // constructor for NaiveBayes
-  public NaiveBayes() { 
+  public NaiveBayes(DataSet train, int print_verbose) { 
+    this.print_verbose = print_verbose;
+    
+    // train on the DataSet
   }
-  
-  // train on a dataset
-  public void Train(DataSet train) { 
-  }
-  
   // classify a particular data
-  public void Classify(DataPoint test) {
+  public int[] Classify(DataSet test) {
+    return new int[0];
   }
 }

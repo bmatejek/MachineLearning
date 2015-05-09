@@ -79,15 +79,14 @@ public class Monks {
           try { ++argv; noise = Double.parseDouble(args[argv]); }
           catch (Exception e) { System.err.printf("Error: need a noise parameter.\n"); return false; }
         }
+        else if (args[argv].equals("-train")) {
+          try { System.err.printf("Training proportion ignored for this data set.\n"); }
+          catch(Exception e) { System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false; }
+        }
         else { System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false; }
       }
       else {
-        if (training_proportion == 0.0) {
-          try { training_proportion = Double.parseDouble(args[argv]); }
-          catch(Exception e) { System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false; }
-          System.err.printf("Training proportion ignored for this data set.\n");
-        }
-        else { System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false; }
+        System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false;
       }
     }
 
