@@ -34,7 +34,7 @@ public class Mushroom {
 	private static double noise = 0.0;
 
 	// array of training/testing file names
-	private static String path_location = "./data/mushrooms/";
+	private static String path_location = "./data/mushroom/";
 	private static String fileName = "agaricus-lepiota";
 	
 
@@ -94,7 +94,7 @@ public class Mushroom {
 		// Read in strings for dataset
 		try {
 			BufferedReader brNames = new BufferedReader(
-									                	new FileReader(fileName + ".names"));
+									      new FileReader(path_location + fileName + ".names"));
 
 			line = brNames.readLine();
 			while (!line.contains("Attribute Information")) {
@@ -115,14 +115,17 @@ public class Mushroom {
 			Pattern categoryPattern  = Pattern.compile("\\p{Digit}.\\p{Blank}((\\p{Alnum}|-)*?\\p{Punct}?):");
 			Pattern attributePattern = Pattern.compile("(\\p{Blank}|,)(\\p{Alnum}*?)=");
 			Pattern symbolPattern    = Pattern.compile("=(.)");
+			int cat = 0; //Number each category
 			while (!line.contains("Missing Attribute Values:")) {
 				Matcher categoryMatcher  = categoryPattern.matcher(line);
 				Matcher attributeMatcher = attributePattern.matcher(line);
 				Matcher symbolMatcher    = symbolPattern.matcher(line);
 
 				// Add next category to category list
-				categoryMatcher.find();
-				String category = categoryMatcher.group(1);
+				String category = " ";
+				if (categoryMatcher.find())
+				  category = categoryMatcher.group(1);
+				
 
 				// Add attributes to attribute list
 				while(attributeMatcher.find()) {
@@ -132,11 +135,17 @@ public class Mushroom {
 
 				// Add symbols to symbol array
 				while(symbolMatcher.find()) 
-					symbols.add(symbolMatcher.group(1));
+					symbols.add(cat + symbolMatcher.group(1));
+				cat++;
 
 				line = brNames.readLine();
 			}
-			mapping = mappingAL.toArray(new String[mappingAL.size()][1]);
+			// toArray method does not work for 2D arrays here.
+			mapping = new String[mappingAL.size()][1];
+			for (int i = 0; i < mapping.length; i++) {
+				mapping[i][0] = mappingAL.get(i);
+			}
+			
 
 		}
 
@@ -148,7 +157,7 @@ public class Mushroom {
 		// Read in actual data and put in base10 and bin forms. 
 		try {
 			BufferedReader brData = new BufferedReader(
-										new FileReader(fileName + ".data"));
+										new FileReader(path_location + fileName + ".data"));
 
 			ArrayList<DataPoint> dataSet = new ArrayList<DataPoint>();
 			while ((line = brData.readLine()) != null) {
@@ -156,17 +165,21 @@ public class Mushroom {
 				int label = labelSymbols.indexOf(elmts[0]);
 				if (Math.random() < noise)
 					label = 1 - label;
-				int[] attribute = new int[elmts.length - 1];
+				int[] attribute = new int[symbols.size()];
 				for (int i = 1; i < elmts.length; i++) {
-					attribute[i-1] = symbols.indexOf(elmts[i]);
+					attribute[symbols.indexOf((i-1) + elmts[i])] = 1;
 				}
 				DataPoint dp = new DataPoint(attribute, label, false);
 				dataSet.add(dp);
+				// System.out.println("\nDatapoint " + label_mapping[label]);
+				// for (int i = 0; i < attribute.length; i++) {
+				// 	System.out.println(mapping[i][0] + "  " + attribute[i]);
+				// }
 			}
 
 			// print out the level of noise
-      if (print_verbose)
-        System.out.printf("Applying a factor of %.2f noise.\n", noise);
+      		if (print_verbose)
+      		    System.out.printf("Applying a factor of %.2f noise.\n", noise);
 
 			List<DataPoint> dsTrain = dataSet.subList(0, (int) training_proportion*dataSet.size()); 
 			List<DataPoint> dsTests = dataSet.subList((int) training_proportion*dataSet.size(), dataSet.size());
