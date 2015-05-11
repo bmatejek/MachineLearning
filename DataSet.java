@@ -58,7 +58,7 @@ public class DataSet {
       binary_data_points[i] = new DataPoint(attributes, label, true);
     }
   }
-  
+
   // functions to add in data points
   public DataPoint KthDataPoint(int k) {
     if (k >= integer_data_points.length || k < 0) {
@@ -75,6 +75,11 @@ public class DataSet {
       return null;
     }
     return new DataPoint(binary_data_points[k]);
+  }
+
+  // return number of datapoints
+  public int NDataPoints() {
+    return integer_data_points.length;
   }
   
   // print out the data set

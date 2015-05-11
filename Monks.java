@@ -19,7 +19,7 @@ public class Monks {
   // array of training/testing file names
   private static String path_location = "./data/monks/";
   private static String[] training_filenames = {"monks-1.train", "monks-2.train", "monks-3.train"};
-  private static String[] testing_filenames = {"monks-1.test", "monks-2.test", "monks-3.test"};
+  private static String[] tessting_filenames = {"monks-1.test", "monks-2.test", "monks-3.test"};
   
   // array of attribute names and corresponding values
   private static String[] attributes = { "a1", "a2", "a3", "a4", "a5", "a6"};

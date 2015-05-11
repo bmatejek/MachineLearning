@@ -14,6 +14,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.regex.*;
+import 
 
 public class Mushroom {
 
@@ -101,14 +102,21 @@ public class Mushroom {
 			System.out.println("LALALALA FILL THIS IN");
 		}
 		
+		String[] labelNames       = labels.toArray(new String[labels.size()]);
+		String[][] attributeNames = attributes.toArray(new String[attributes.size()][]);
+		String[] categoryNames    = categories.toArray(new	String[categories.size()]);
+		String[][] symbolNames    = symbols.toArray(new String[symbols.size()][]);
 
 		// Read in actual data and put in base10 and bin forms. 
 		try {
 			BufferedReader brData = new BufferedReader(
 										new FileReader(fileName + ".data"));
-			int temp = 0;
+
+			ArrayList<DataPoint> dSet = new ArrayList<DataPoint>();
 			while ((line = brData.readLine()) != null) {
 				String[] elmts = line.split(",");
+				int label = java.util.Arrays.asList();
+				//DataPoint dp = new DataPoint(, )
 				
 			}
 		}
