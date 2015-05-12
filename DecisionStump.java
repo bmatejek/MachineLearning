@@ -34,7 +34,8 @@ public class DecisionStump implements Learner {
       DataPoint temp = train.KthDataPoint(i);
       labels[i] = temp.Label();
       // Set each attribute for example i
-      // While iterating, 
+      // While iterating, count number of 
+      // positive and negative examples
       if (labels[i] == 0) {
         for (int j = 0; j < X[0].length; j++) {
           X[i][j] = temp.KthAttribute(j);

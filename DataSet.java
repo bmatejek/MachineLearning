@@ -57,7 +57,7 @@ public class DataSet {
       }
       binary_data_points[i] = new DataPoint(attributes, label, true);
     }
-  }
+  } 
 
   // functions to add in data points
   public DataPoint KthDataPoint(int k) {
