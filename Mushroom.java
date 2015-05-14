@@ -86,8 +86,8 @@ public class Mushroom {
 		String[] label_mapping = null;
 		ArrayList<String> labelAL      = new ArrayList<String>();
 		ArrayList<String> labelSymbols = new ArrayList<String>();
-		ArrayList<String> mappingAL    = new ArrayList<String>();
-		ArrayList<String> symbols      = new ArrayList<String>();
+		ArrayList<ArrayList<String>> mappingAL    = new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> symbols      = new ArrayList<ArrayList<String>>();
 		
 		// Read in strings for dataset
 		try {
@@ -113,36 +113,55 @@ public class Mushroom {
 			Pattern categoryPattern  = Pattern.compile("\\p{Digit}.\\p{Blank}((\\p{Alnum}|-)*?\\p{Punct}?):");
 			Pattern attributePattern = Pattern.compile("(\\p{Blank}|,)(\\p{Alnum}*?)=");
 			Pattern symbolPattern    = Pattern.compile("=(.)");
-			int cat = 0; //Number each category
+			int max = 0;
 			while (!line.contains("Missing Attribute Values:")) {
 				Matcher categoryMatcher  = categoryPattern.matcher(line);
 				Matcher attributeMatcher = attributePattern.matcher(line);
 				Matcher symbolMatcher    = symbolPattern.matcher(line);
 
 				// Add next category to category list
-				String category = " ";
+				ArrayList<String> temp = new ArrayList<String>();
 				if (categoryMatcher.find())
-				  category = categoryMatcher.group(1);
+				  temp.add(categoryMatcher.group(1));
 				
 
 				// Add attributes to attribute list
 				while(attributeMatcher.find()) {
-					String attribute = category + "-" + attributeMatcher.group(2);
-					mappingAL.add(attribute);
+					temp.add(attributeMatcher.group(2));
 				}
+				if (temp.size() != 0)
+					mappingAL.add(temp);
 
 				// Add symbols to symbol array
-				while(symbolMatcher.find()) 
-					symbols.add(cat + symbolMatcher.group(1));
-				cat++;
+				temp = new ArrayList<String>();
+				while(symbolMatcher.find()) {
+					temp.add(symbolMatcher.group(1));
+				}
+				if (temp.size() > max) max = temp.size();
+				if (temp.size() != 0)
+				  symbols.add(temp);
 
 				line = brNames.readLine();
 			}
 			// toArray method does not work for 2D arrays here.
-			mapping = new String[mappingAL.size()][1];
+			mapping = new String[mappingAL.size()][max];
 			for (int i = 0; i < mapping.length; i++) {
-				mapping[i][0] = mappingAL.get(i);
+				mapping[i] = mappingAL.get(i).toArray(new String[max]);
 			}
+			// for (int i = 0; i < mapping.length; i++) {
+			// 	for (int j = 0; j < mapping[0].length; j++) {
+			// 		System.out.print(mapping[i][j] + " ");
+			// 	}
+			// 	System.out.println();
+			// }
+			// for (int i = 0; i < symbols.size(); i++) {
+			// 	ArrayList<String> temp = symbols.get(i);
+			// 	for (int j = 0; j < temp.size(); j++) {
+			// 		System.out.print(temp.get(j) + " ");
+			// 	} 
+			// 	System.out.println();
+			// }
+			
 			
 
 		}
@@ -165,13 +184,13 @@ public class Mushroom {
 					label = 1 - label;
 				int[] attribute = new int[symbols.size()];
 				for (int i = 1; i < elmts.length; i++) {
-					attribute[symbols.indexOf((i-1) + elmts[i])] = 1;
+					attribute[i-1] = symbols.get(i-1).indexOf(elmts[i]);
 				}
 				DataPoint dp = new DataPoint(attribute, label, false);
 				dataSet.add(dp);
 				// System.out.println("\nDatapoint " + label_mapping[label]);
 				// for (int i = 0; i < attribute.length; i++) {
-				// 	System.out.println(mapping[i][0] + "  " + attribute[i]);
+				// 	System.out.println(mapping[i][attribute[i] + 1] + "  " + attribute[i]);
 				// }
 			}
 
@@ -206,37 +225,3 @@ public class Mushroom {
 
 }
 
-
-
-/*
-	Hi Brian,
-	What I have now, is the following:
-
-	Name: labels
-	An ArrayList of the strings of each possible label. 
-
-	Name: categories
-	An ArrayList of strings giving the names of each category of each attribute,
-		i.e., for mushrooms, that's "cap-shape", "cap-surface", etc. 
-
-	Name: attributes
-	An ArrayList of ArrayLists with possibilities for each category. 
-		Element ij gives the string name of the jth option 
-		for the ith characteristic. (I.e., if it's element {2,3} for
-		mushrooms, that'd be gray, per item 7 in file agaricus-lepiota.names
-		that gives the labels/attributes/etc for the mushrooms. Note - used zero
-		indexing.)
-
-	Name: dataSet
-	An ArrayList of DataPoints. This hasn't actually been made, it's commented
-		out above. I was expecting to pass it a single integer, indicating the 
-		index of its label in the label ArrayList, and then an integer array, the
-		length of the number of categories, where each element gives the particular
-		attribute. I.e, we can get the label for the attribute by accessing the attribute
-		arraylist of arraylists as follows: attributes.get(i).get(attribute[i]). 
-		Note, "attributes" is the arraylist of arraylists holding strings to describe
-		each possible attribute, and "attribute" is the int array that represents the 
-		attributes of a particular data point. 
-
-	I have some other info, but I expect this is what's relevant. 
-*/
