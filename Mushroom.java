@@ -28,8 +28,9 @@ public class Mushroom {
 	private static boolean random_forest = false;
 	private static boolean svm = false;
 	private static boolean weighted_majority = false;
-	private static double training_proportion = 0.0;
+	private static double training_proportion = 0.1;
 	private static double noise = 0.0;
+
 
 	// array of training/testing file names
 	private static String path_location = "./data/mushroom/";
@@ -172,6 +173,8 @@ public class Mushroom {
 		
 
 		// Read in actual data and put in base10 and bin forms. 
+		DataSet training_dataset = null;
+		DataSet testing_dataset  = null;
 		try {
 			BufferedReader brData = new BufferedReader(
 										new FileReader(path_location + fileName + ".data"));
@@ -198,13 +201,25 @@ public class Mushroom {
       		if (print_verbose)
       		    System.out.printf("Applying a factor of %.2f noise.\n", noise);
 
-			List<DataPoint> dsTrain = dataSet.subList(0, (int) training_proportion*dataSet.size()); 
-			List<DataPoint> dsTests = dataSet.subList((int) training_proportion*dataSet.size(), dataSet.size());
+      		ArrayList<DataPoint> dsTrain = new ArrayList<DataPoint>();
+      		ArrayList<DataPoint> dsTests = new ArrayList<DataPoint>();
+      		for (int i = 0; i < dataSet.size(); i++) {
+      			if (Math.random() < training_proportion)
+      				dsTrain.add(dataSet.get(i));
+      			else {
+      				dsTests.add(dataSet.get(i));
+      			}
+      		}
+			// List<DataPoint> dsTrain = dataSet.subList(0, (int) (training_proportion*dataSet.size())); 
+			// List<DataPoint> dsTests = dataSet.subList((int) (training_proportion*dataSet.size()), dataSet.size());
 			DataPoint[] data_points_train = dsTrain.toArray(new DataPoint[dsTrain.size()]);
 			DataPoint[] data_points_tests = dsTests.toArray(new DataPoint[dsTests.size()]);
-			DataSet training_dataset = new DataSet(mapping, label_mapping, data_points_train);
-			DataSet testing_datasets = new DataSet(mapping, label_mapping, data_points_tests);
-
+			training_dataset = new DataSet(mapping, label_mapping, data_points_train);
+			testing_dataset  = new DataSet(mapping, label_mapping, data_points_tests);
+			if (print_verbose){
+				System.out.println("training_dataset size: " + training_dataset.NDataPoints());
+				System.out.println("testing_dataset size:  " + testing_dataset.NDataPoints());
+			}
 		}
 
 		catch (IOException e) {
@@ -212,14 +227,34 @@ public class Mushroom {
 		}
 
 		// run all of the instances specified by the user
-    if (ada_boost) {}
-    if (decision_stump) {}
-    if (decision_tree) {}
-    if (naive_bayes) {}
-    if (neural_network) {}
-    if (random_forest) {}
-    if (svm) {}
-    if (weighted_majority) {}
+    	if (ada_boost) {}
+    	if (decision_stump) {
+    		double[] w = new double[training_dataset.NDataPoints()];
+	    	double val = 1.0 / w.length;
+	    	for (int i = 0; i < w.length; i++) {
+	    		w[i] = val;
+	    	}
+	    	DecisionStump stump = new DecisionStump(training_dataset, w, 1);
+	    	int[] output = stump.Classify(testing_dataset);
+
+	    	int right = 0;
+	    	int wrong = 0;
+	    	for (int i = 0; i < output.length; i++) {
+	    		if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
+	    			right++;
+	    		}
+	    		else {
+	    			wrong++;
+	    		}
+	    	}
+	    	System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+	    }
+	    if (decision_tree) {}
+	    if (naive_bayes) {}
+	    if (neural_network) {}
+	    if (random_forest) {}
+	    if (svm) {}
+	    if (weighted_majority) {}
 
 	}
 

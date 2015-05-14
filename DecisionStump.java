@@ -28,10 +28,10 @@ public class DecisionStump implements Learner {
 
 
     // Set up local copy of training data and labels
-    this.X = new int[train.NDataPoints()][train.KthDataPoint(0).NAttributes()];
+    this.X = new int[train.NDataPoints()][train.KthBinaryDataPoint(0).NAttributes()];
     this.labels = new int[X.length];
     for (int i = 0; i < X.length; i++) {
-      DataPoint temp = train.KthDataPoint(i);
+      DataPoint temp = train.KthBinaryDataPoint(i);
       labels[i] = temp.Label();
       // Set each attribute for example i
       // While iterating, count number of 
@@ -103,6 +103,15 @@ public class DecisionStump implements Learner {
 
   // classify a particular data
   public int[] Classify(DataSet test) {
-    return new int[0];
+    int[] output = new int[test.NDataPoints()];
+    for (int i = 0; i < output.length; i++) {
+      DataPoint dp = test.KthBinaryDataPoint(i);
+      int[] attributes = new int[dp.NAttributes()];
+      for (int j = 0; j < attributes.length; j++) {
+        attributes[j] = dp.KthAttribute(j);
+      }
+      output[i] = h(attributes);
+    }
+    return output;
   }
 }
