@@ -1,4 +1,4 @@
-package MachineLearning.RandomForest;
+package MachineLearning.TreeBagging;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,40 +7,40 @@ import java.util.Vector;
 import java.util.HashMap;
 import MachineLearning.*;
 
-public class RandomForest implements Learner {
+public class TreeBagging implements Learner {
   private final boolean print_verbose;
   private final DataSet train;
   private final int forest_size;
-  private RFTree[] trees;
+  private TBTree[] trees;
   
   // create the actual tree structure
-  private class RFTree { 
+  private class TBTree { 
     int label;
     int[] splitting_attributes;
-    HashMap<List<Integer>, RFTree> subtrees;
+    HashMap<List<Integer>, TBTree> subtrees;
     
     // tree that is a leaf has no root test
-    private RFTree(int label) {
+    private TBTree(int label) {
       this.label = label;
       this.splitting_attributes = null;
       this.subtrees = null;
     }
     
-    public RFTree(int[] splitting_attributes) {
+    public TBTree(int[] splitting_attributes) {
       this.splitting_attributes = new int[splitting_attributes.length];
       for (int i = 0; i < splitting_attributes.length; ++i)
         this.splitting_attributes[i] = splitting_attributes[i];
       this.label = -1;
-      subtrees = new HashMap<List<Integer>, RFTree>();
+      subtrees = new HashMap<List<Integer>, TBTree>();
     }
     
     // add the subtree to this tree
-    public void AddSubTree(List<Integer> key, RFTree tree) {
+    public void AddSubTree(List<Integer> key, TBTree tree) {
       subtrees.put(key, tree);
     }
     
     // return the subtree 
-    public RFTree SubTree(List<Integer> key) {
+    public TBTree SubTree(List<Integer> key) {
       return subtrees.get(key);
     }
     
@@ -110,26 +110,33 @@ public class RandomForest implements Learner {
     return remainder;
   }
   
-  private RFTree DecisionTreeLearning(Vector<DataPoint> examples,  Vector<Integer> attributes, Vector<DataPoint> parent_examples) {
+  private int[] Importance(Vector<Integer> attributes, Vector<DataPoint> examples) {
+    // return an array of size one for decision trees
+    int A = -1;
+    double least_remainder = Double.MAX_VALUE;
+    for (int i = 0; i < attributes.size(); ++i) {
+      int a = attributes.get(i);
+      double remainder = Remainder(a, examples);
+      if (remainder < least_remainder) {
+        least_remainder = remainder;
+        A = a;
+      }
+    }
+    int[] ret = {A};
+    return ret;
+  }
+  
+  private TBTree DecisionTreeLearning(Vector<DataPoint> examples,  Vector<Integer> attributes, Vector<DataPoint> parent_examples) {
     // if examples is empty then return Plurality-Value(parent_examples)
-    if (examples.size() == 0) return new RFTree(PluralityValue(parent_examples));
+    if (examples.size() == 0) return new TBTree(PluralityValue(parent_examples));
     // else if all examples have the same classification then return the classification
-    else if (SameClassification(examples)) return new RFTree(examples.get(0).Label());
+    else if (SameClassification(examples)) return new TBTree(examples.get(0).Label());
     // else if attributes is empty then return Plurality-Value(examples)
-    else if (attributes.size() == 0) return new RFTree(PluralityValue(examples));
+    else if (attributes.size() == 0) return new TBTree(PluralityValue(examples));
     // or else
     else {
       // A <- argmax a \in attributes Importance(a, examples)
-      
-      // randomly select sqrt{n} attributes to split on
-      int amount = (int) Math.round(Math.min(Math.floor(Math.sqrt(train.NAttributes())), attributes.size())); 
-      
-      Collections.shuffle(attributes);
-      
-      int[] A = new int[amount];
-      for (int i = 0; i < amount; ++i) {
-        A[i] = attributes.get(i);
-      }
+      int[] A = Importance(attributes, examples);
       
       // create a list of attributes without A
       Vector<Integer> attributes_sans_A = new Vector<Integer>();
@@ -140,7 +147,7 @@ public class RandomForest implements Learner {
         }
         if (include) attributes_sans_A.addElement(attributes.get(ia));
       }
-      RFTree tree = new RFTree(A);
+      TBTree tree = new TBTree(A);
       RecursiveMethod(A, new Integer[0], A, examples, attributes_sans_A, tree);
       return tree;
     }
@@ -163,7 +170,7 @@ public class RandomForest implements Learner {
     return c;
   }
   
-  public void RecursiveMethod(int[] attributes_remaining, Integer[] attributes_determined, int[] A, Vector<DataPoint> examples, Vector<Integer> attributes, RFTree tree) {
+  public void RecursiveMethod(int[] attributes_remaining, Integer[] attributes_determined, int[] A, Vector<DataPoint> examples, Vector<Integer> attributes, TBTree tree) {
     if (attributes_remaining.length == 0) {
       // get all of the examples that belong to this pattern
       Vector<DataPoint> exs = new Vector<DataPoint>();
@@ -186,12 +193,12 @@ public class RandomForest implements Learner {
     }
   }
   
-  // constructor for RandomForest
-  public RandomForest(DataSet train, boolean print_verbose, int forest_size) { 
+  // constructor for TreeBagging
+  public TreeBagging(DataSet train, boolean print_verbose, int forest_size) { 
     this.print_verbose = print_verbose;
     this.train = train;
     this.forest_size = forest_size;
-    this.trees = new RFTree[forest_size];
+    this.trees = new TBTree[forest_size];
     
     Vector<DataPoint> parent_examples = new Vector<DataPoint>();
     Vector<Integer> attributes = new Vector<Integer>();
@@ -209,12 +216,12 @@ public class RandomForest implements Learner {
   }
   
   // constructor for RandomForest
-  public RandomForest(DataSet train, boolean print_verbose) {
+  public TreeBagging(DataSet train, boolean print_verbose) {
     this(train, print_verbose, 1000);
   }
   
   // classify example
-  private int ClassifyExample(DataPoint data_point, RFTree tree) {
+  private int ClassifyExample(DataPoint data_point, TBTree tree) {
     if (tree.label != -1) return tree.label;
     else {
       int[] tree_splitting_value = tree.splitting_attributes;

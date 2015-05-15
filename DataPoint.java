@@ -1,3 +1,5 @@
+package MachineLearning;
+
 public class DataPoint {
   private int[] attributes;  // list of attributes
   private int label;         // class label of this data point
@@ -37,6 +39,13 @@ public class DataPoint {
     return attributes[k];
   }
   
+  public int[] Attributes() {
+    int[] ret = new int[attributes.length];
+    for (int i = 0; i < attributes.length; ++i) 
+      ret[i] = attributes[i];
+    return ret;
+  }
+  
   // accessor for the label of this data point
   public int Label() {
     return label;
@@ -45,5 +54,15 @@ public class DataPoint {
   // is this a binary data point
   public boolean isBinary() {
     return isBinary;
+  }
+  
+  // print out this data point
+  public String toString() {
+    String string = "";
+    for (int i = 0; i < attributes.length; ++i) {
+      string += Integer.toString(attributes[i]) + "\t";
+    }
+    string += Integer.toString(label);
+    return string;
   }
 }
