@@ -208,162 +208,164 @@ public class Monks {
       testing_datasets[i] = new DataSet(mapping, label_mapping, data_points.toArray(new DataPoint[data_points.size()]));
     }
     
-    // run all of the instances specified by the user
-    if (ada_boost) {
-      System.out.printf("Ada Boost:\n");
-      AdaBoost ab = new AdaBoost(training_datasets[0], print_verbose); 
-      int[] test = ab.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences  = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+    for (int k = 0; k < testing_datasets.length; ++k) {
+      // run all of the instances specified by the user
+      if (ada_boost) {
+        System.out.printf("Ada Boost:\n");
+        AdaBoost ab = new AdaBoost(training_datasets[k], print_verbose); 
+        int[] test = ab.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences  = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
         }
-        noccurences[label]++;
-      }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (decision_stump) {
-      System.out.printf("Decision Stump:\n");
-      double[] w = new double[training_datasets[0].NDataPoints()];
-      for (int i = 0; i < w.length; ++i)
-        w[i] = 1.0;
-      DecisionStump ds = new DecisionStump(training_datasets[0], w, print_verbose); 
-      int[] test = ds.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences  = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
         }
-        noccurences[label]++;
       }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (decision_tree) { 
-      System.out.printf("Decision Tree:\n");
-      DecisionTree dt = new DecisionTree(training_datasets[0], print_verbose); 
-      int[] test = dt.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences  = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+      if (decision_stump) {
+        System.out.printf("Decision Stump:\n");
+        double[] w = new double[training_datasets[k].NDataPoints()];
+        for (int i = 0; i < w.length; ++i)
+          w[i] = 1.0;
+        DecisionStump ds = new DecisionStump(training_datasets[k], w, print_verbose); 
+        int[] test = ds.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences  = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
         }
-        noccurences[label]++;
-      }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (naive_bayes) {
-      System.out.printf("Naive Bayes:\n");
-      NaiveBayes nb = new NaiveBayes(training_datasets[0], print_verbose);
-      int[] test = nb.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
         }
-        noccurences[label]++;
       }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (neural_network) {
-      System.out.printf("Neural Network:\n");
-      int k = 0;
-      NeuralNetwork nn = new NeuralNetwork(training_datasets[k], print_verbose);
-      int[] test = nn.Classify(testing_datasets[k]);
-      int[] ncorrect = new int[testing_datasets[k].NLabels()];
-      int[] noccurences = new int[testing_datasets[k].NLabels()];
-      for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
-        int label = testing_datasets[k].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+      if (decision_tree) { 
+        System.out.printf("Decision Tree:\n");
+        DecisionTree dt = new DecisionTree(training_datasets[k], print_verbose); 
+        int[] test = dt.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences  = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
         }
-        noccurences[label]++;
-      }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (random_forest) {
-      System.out.printf("Random Forest:\n");
-      RandomForest rf = new RandomForest(training_datasets[0], print_verbose, 1000);
-      int[] test = rf.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
         }
-        noccurences[label]++;
       }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (svm) {
-      System.out.printf("SVM:\n");
-      SVM svm = new SVM(training_datasets[0], print_verbose);
-      int[] test = svm.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+      if (naive_bayes) {
+        System.out.printf("Naive Bayes:\n");
+        NaiveBayes nb = new NaiveBayes(training_datasets[k], print_verbose);
+        int[] test = nb.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
         }
-        noccurences[label]++;
-      }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (tree_bagging) {
-      System.out.printf("Tree Bagging:\n");
-      TreeBagging tb = new TreeBagging(training_datasets[0], print_verbose, 1000);
-      int[] test = tb.Classify(testing_datasets[0]);
-      int[] ncorrect = new int[testing_datasets[0].NLabels()];
-      int[] noccurences = new int[testing_datasets[0].NLabels()];
-      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
-        int label = testing_datasets[0].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
         }
-        noccurences[label]++;
       }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
-      }
-    }
-    if (weighted_majority) {
-      System.out.printf("Weighted Majority:\n");
-      WeightedMajority wm = new WeightedMajority(training_datasets[2], print_verbose);
-      int[] test = wm.Classify(testing_datasets[2]);
-      int[] ncorrect = new int[testing_datasets[2].NLabels()];
-      int[] noccurences = new int[testing_datasets[2].NLabels()];
-      for (int i = 0; i < testing_datasets[2].NDataPoints(); ++i) {
-        int label = testing_datasets[2].KthDataPoint(i).Label();
-        if (test[i] == label) {
-          ncorrect[label]++;
+      if (neural_network) {
+        System.out.printf("Neural Network:\n");
+        int k = 0;
+        NeuralNetwork nn = new NeuralNetwork(training_datasets[k], print_verbose);
+        int[] test = nn.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
         }
-        noccurences[label]++;
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
+        }
       }
-      for (int i = 0; i < ncorrect.length; ++i) {
-        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      if (random_forest) {
+        System.out.printf("Random Forest:\n");
+        RandomForest rf = new RandomForest(training_datasets[0], print_verbose, 1000);
+        int[] test = rf.Classify(testing_datasets[0]);
+        int[] ncorrect = new int[testing_datasets[0].NLabels()];
+        int[] noccurences = new int[testing_datasets[0].NLabels()];
+        for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+          int label = testing_datasets[0].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
+        }
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
+        }
+      }
+      if (svm) {
+        System.out.printf("SVM:\n");
+        SVM svm = new SVM(training_datasets[k], print_verbose);
+        int[] test = svm.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
+        }
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
+        }
+      }
+      if (tree_bagging) {
+        System.out.printf("Tree Bagging:\n");
+        TreeBagging tb = new TreeBagging(training_datasets[k], print_verbose, 1000);
+        int[] test = tb.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
+        }
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
+        }
+      }
+      if (weighted_majority) {
+        System.out.printf("Weighted Majority:\n");
+        WeightedMajority wm = new WeightedMajority(training_datasets[k], print_verbose);
+        int[] test = wm.Classify(testing_datasets[k]);
+        int[] ncorrect = new int[testing_datasets[k].NLabels()];
+        int[] noccurences = new int[testing_datasets[k].NLabels()];
+        for (int i = 0; i < testing_datasets[k].NDataPoints(); ++i) {
+          int label = testing_datasets[k].KthDataPoint(i).Label();
+          if (test[i] == label) {
+            ncorrect[label]++;
+          }
+          noccurences[label]++;
+        }
+        for (int i = 0; i < ncorrect.length; ++i) {
+          System.out.println(ncorrect[i] + "/" + noccurences[i]);
+        }
       }
     }
   }
