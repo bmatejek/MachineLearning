@@ -1,3 +1,5 @@
+package MachineLearning;
+
 public class DecisionStump implements Learner {
   private final int print_verbose;
   private int decision_attribute; // index of attribute used to make decision

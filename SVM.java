@@ -1,3 +1,5 @@
+package MachineLearning;
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
@@ -9,7 +11,7 @@ public class SVM implements Learner {
   private double C = 1.0; // weighting of training vs regularization
   private double eps = 1.0e-5; // Accuracy for determining convergence 
   private int convergence = 10; // number of updates less than eps wanted for convergence
-  private final int learning_time = 600000; // (10 minutes)
+  private final int learning_time = 30000; // (time in milliseconds)
   private int[][] X;  // Training set
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients
@@ -141,13 +143,10 @@ public class SVM implements Learner {
     // train on the DataSet 
     Timer timer = new Timer(learning_time);
     int run = 0;
-    int temp = 0;
-    while (temp < 200000 && run < convergence && timer.getTimeRemaining() >= 0) {
+    while (run < convergence && timer.getTimeRemaining() >= 0) {
       if (this.gradient_step() < this.eps) run++;
       else run = 0;
-      temp++;
     }
-    System.out.println(temp);
   }
   
   /*
