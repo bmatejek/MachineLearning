@@ -14,7 +14,7 @@ public class DataSet {
     n_classes_per_attribute = new int[mapping.length];         // number of classes per attribute
     for (int i = 0; i < n_classes_per_attribute.length; ++i) 
       n_classes_per_attribute[i] = 0;
-    
+
     // copy in the mapping array
     this.mapping = new String[mapping.length][];
     for (int i = 0; i < this.mapping.length; ++i) {
@@ -36,7 +36,7 @@ public class DataSet {
     
     // create new vectors for integer and binary data points
     integer_data_points = new DataPoint[data_points.length];
-    binary_data_points = new DataPoint[data_points.length];
+    binary_data_points  = new DataPoint[data_points.length];
     
     // fill in the integer data points list
     for (int i = 0; i < integer_data_points.length; ++i) {
@@ -47,10 +47,11 @@ public class DataSet {
       int label = data_point.Label();
       int attributes[] = new int[n_binary_attributes];
       
+      // JAVA AUTOINITIALIZES TO ZERO
       // initialize all to 0
-      for (int j = 0; j < attributes.length; ++j) {
-        attributes[j] = 0;
-      }
+      // for (int j = 0; j < attributes.length; ++j) {
+      //   attributes[j] = 0;
+      // }
       
       // fill in the rest of the binary data set
       int seen_so_far = 0;
