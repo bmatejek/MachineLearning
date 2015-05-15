@@ -120,7 +120,7 @@ public class AdaBoost implements Learner {
     for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
       DecisionStump DS = new DecisionStump(train, w, print_verbose);
       double DS_err = this.getErr(DS);
-      if (DS_err > 0.5) continue;
+      //if (DS_err > 0.5) continue;
       l.add(DS);
       al.add(getAlpha(DS_err));
       this.updateWeights(DS_err);
