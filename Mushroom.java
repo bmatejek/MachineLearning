@@ -30,8 +30,9 @@ public class Mushroom {
 	private static boolean neural_network = false;
 	private static boolean random_forest = false;
 	private static boolean svm = false;
+	private static boolean svmCNoise = false;
 	private static boolean weighted_majority = false;
-	private static double training_proportion = 0.001;
+	private static double training_proportion = 0.1;
 	private static double noise = 0.0;
 
 
@@ -53,6 +54,7 @@ public class Mushroom {
         else if (args[argv].equals("-NeuralNetwork")) neural_network = true;
         else if (args[argv].equals("-RandomForest")) random_forest = true;
         else if (args[argv].equals("-SVM")) svm = true;
+        else if (args[argv].equals("-SVM-c-noise")) svmCNoise = true;
         else if (args[argv].equals("-WeightedMajority")) weighted_majority = true;
         else if (args[argv].equals("-noise")) { 
           try { ++argv; noise = Double.parseDouble(args[argv]); }
@@ -186,8 +188,8 @@ public class Mushroom {
 			while ((line = brData.readLine()) != null) {
 				String[] elmts = line.split(",");
 				int label = labelSymbols.indexOf(elmts[0]);
-				if (Math.random() < noise)
-					label = 1 - label;
+				// if (Math.random() < noise)
+				// 	label = 1 - label;
 				int[] attribute = new int[symbols.size()];
 				for (int i = 1; i < elmts.length; i++) {
 					attribute[i-1] = symbols.get(i-1).indexOf(elmts[i]);
@@ -291,6 +293,64 @@ public class Mushroom {
 	    		}
 	    	}
 	    	System.out.println("SVM Error Rate: " + ((double) wrong / (wrong + right)));
+	    }
+	    if (svmCNoise) {
+	    	// int a_mag_min = -10;
+	    	// int a_mag_max = -1;
+	    	// double[] alphas = new double[(a_mag_max - a_mag_min + 1)];
+	    	// for (int i = 0; i < alphas.length; i++) {
+	    	// 	alphas[i] = Math.pow(10, a_mag_min + i);
+	    	// 	//alphas[2*i + 1] = 5 * Math.pow(10, a_mag_min + i);
+	    	// }
+
+	    	// double C = 1.0;
+
+	    	double noise_min = 0.0;
+	    	double noise_max = 0.2;
+	    	double noise_stp = 0.05;
+
+	    	double[] noise = new double[(noise_max - noise_min)/noise_stp + 1];
+	    	for (int i = 0; i < noise.length; i++) {
+	    		noise[i] = noise_min + i*noise_stp;
+	    	}
+	    	DataPoint[] data_points_train = dsTrain.toArray(new DataPoint[dsTrain.size()]);
+			DataPoint[] data_points_tests = dsTests.toArray(new DataPoint[dsTests.size()]);
+			training_dataset = new DataSet(mapping, label_mapping, data_points_train);
+			testing_dataset  = new DataSet(mapping, label_mapping, data_points_tests);
+
+			DataSet[] trainingSets = new DataSet[noise.length];
+			for (int i = 0; i < trainingSets.length; i++) {
+				ArrayList<DataPoint> pts = new ArrayList<DataPoint>();
+				if (Math.random() < noise[i]) {
+					DataPoint dp = 
+				}
+			}
+
+
+	    	int C_mag_min = -5;
+	    	int C_mag_max = 5;
+	    	double[] Cs = new double[C_mag_max - C_mag_min + 1];
+	    	for (int i = 0; i < Cs.length; i++) {
+	    		Cs[i] = Math.pow(10, C_mag_min + i);
+	    	}
+	    	double alpha = 1.0e-4;
+	    	for (int i = 0; i < Cs.length; i++) {
+	    		SVM svm = new SVM(training_dataset, prnt, alpha, Cs[i]);
+		    	int[] output = svm.Classify(testing_dataset);
+
+		    	int right = 0;
+		    	int wrong = 0;
+		    	for (int j = 0; j < output.length; j++) {
+		    		if (output[j] == testing_dataset.KthBinaryDataPoint(j).Label()) {
+		    			right++;
+		    		}
+		    		else {
+		    			wrong++;
+		    		}
+		    	}
+		    	System.out.println("SVM Error Rate (C = " + Cs[i] + "): " + ((double) wrong / (wrong + right)));
+	    	}
+
 	    }
 	    if (weighted_majority) {}
 
