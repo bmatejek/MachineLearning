@@ -22,6 +22,10 @@ public class AdaBoost implements Learner {
     for (int i = 0; i < predictions.length; i++) {
       if (predictions[i] != labels[i]) {
         errorWeight += w[i];
+        missed[i] = true;
+      }
+      else {
+        missed[i] = false;
       }
     }
     return errorWeight;
@@ -46,25 +50,34 @@ public class AdaBoost implements Learner {
     this.err = errorWeight;
   }
 
-  private double getAlpha() {
-    return 0.5 * (Math.log(1 - this.err) - Math.log(this.err)) / Math.log(Math.E);
+  private double getAlpha(double error) {
+    return 0.5 * (Math.log(1 - error) - Math.log(error)) / Math.log(Math.E);
   }
 
   // private double getNorm() {
   //   return 2.0 * Math.sqrt(this.err * (1.0 - this.err));
   // }
 
-  private void updateWeights() {
+  private void updateWeights(double error) {
     for (int i = 0; i < this.w.length; i++) {
       if (this.missed[i]) {
-        w[i] = 0.5 * w[i] / this.err;
+        w[i] = 0.5 * w[i] / error;
+        // w[i] *= Math.exp(al.get(al.size()-1)); UNNORMALIZED
       }
       else {
-        w[i] = 0.5 * w[i] / (1.0 - this.err);
+        w[i] = 0.5 * w[i] / (1.0 - error);
+        //w[i] *= Math.exp(-1.0 * al.get(al.size()-1)); UNNORMALIZED
       }
     }
-
-    
+    if (print_verbose == 1) {
+      double sum = 0.0;
+      for (int i = 0; i < this.w.length; i++) {
+        sum += w[i];
+      }
+      if (Math.abs(sum - 1.0) > 1.0e-10) {
+        System.out.println("Weights sum to " + sum);
+      }
+    }
   }
   
   // constructor for AdaBoost, boosting solely on Decision Stumps
@@ -96,28 +109,41 @@ public class AdaBoost implements Learner {
     missed = new boolean[this.labels.length];
     this.err = Double.MAX_VALUE;
     this.K   = Integer.MAX_VALUE;
+    //int asdf = 1;
     for (int i = 0; i < this.K && this.err > this.eps; i++) {
       DecisionStump DS = new DecisionStump(train, w, print_verbose);
-      if (this.getErr(DS) > 0.5) break;
+      double DS_err = this.getErr(DS);
+      if (DS_err > 0.5) break;
       l.add(DS);
+      al.add(getAlpha(DS_err));
+      this.updateWeights(DS_err);
       this.updateErr();
-      al.add(getAlpha());
-      this.updateWeights();
+      //asdf = 0;
+
     }
   }
 
   // classify a particular dataset
   public int[] Classify(DataSet test) {
-    int[] ret = new int[test.NDataPoints()];
+    double[] sum = new double[test.NDataPoints()];
     for (int i = 0; i < this.l.size(); i++) {
       int[] results = l.get(i).Classify(test);
       for (int j = 0; j < results.length; j++) {
         if (results[j] == 0) {
-          ret[j] -= this.al.get(j);
+          sum[j] -= this.al.get(i);
         }
         else {
-          ret[j] += this.al.get(j);
+          sum[j] += this.al.get(i);
         }
+      }
+    }
+    int[] ret = new int[sum.length];
+    for (int i = 0; i < ret.length; i++) {
+      if (sum[i] < 0.0) {
+        ret[i] = 0;
+      }
+      else {
+        ret[i] = 1;
       }
     }
     return ret;

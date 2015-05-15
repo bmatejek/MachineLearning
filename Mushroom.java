@@ -227,7 +227,22 @@ public class Mushroom {
 		}
 
 		// run all of the instances specified by the user
-    	if (ada_boost) {}
+    	if (ada_boost) {
+    		AdaBoost boost = new AdaBoost(training_dataset, 1);
+    		int[] output = boost.Classify(testing_dataset);
+
+    		int right = 0;
+    		int wrong = 0;
+    		for (int i = 0; i < output.length; i++) {
+    			if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
+    				right++;
+    			}
+    			else {
+    				wrong++;
+    			}
+    		}
+    		System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+    	}
     	if (decision_stump) {
     		double[] w = new double[training_dataset.NDataPoints()];
 	    	double val = 1.0 / w.length;
@@ -253,7 +268,22 @@ public class Mushroom {
 	    if (naive_bayes) {}
 	    if (neural_network) {}
 	    if (random_forest) {}
-	    if (svm) {}
+	    if (svm) {
+	    	SVM svm = new SVM(training_dataset, 1);
+	    	int[] output = svm.Classify(testing_dataset);
+
+	    	int right = 0;
+	    	int wrong = 0;
+	    	for (int i = 0; i < output.length; i++) {
+	    		if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
+	    			right++;
+	    		}
+	    		else {
+	    			wrong++;
+	    		}
+	    	}
+	    	System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+	    }
 	    if (weighted_majority) {}
 
 	}
