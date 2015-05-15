@@ -19,6 +19,16 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
+import MachineLearning.*;
+import MachineLearning.AdaBoost.*;
+import MachineLearning.DecisionStump.*;
+import MachineLearning.DecisionTree.*;
+import MachineLearning.NaiveBayes.*;
+import MachineLearning.NeuralNetwork.*;
+import MachineLearning.RandomForest.*;
+import MachineLearning.SVM.*;
+import MachineLearning.TreeBagging.*;
+import MachineLearning.WeightedMajority.*;
 
 public class Mushroom {
 	// command line arguments
@@ -94,6 +104,8 @@ public class Mushroom {
 		ArrayList<String> labelSymbols = new ArrayList<String>();
 		ArrayList<ArrayList<String>> mappingAL    = new ArrayList<ArrayList<String>>();
 		ArrayList<ArrayList<String>> symbols      = new ArrayList<ArrayList<String>>();
+		ArrayList<DataPoint> dsTrain = new ArrayList<DataPoint>();
+      	ArrayList<DataPoint> dsTests = new ArrayList<DataPoint>();
 		
 		// Read in strings for dataset
 		try {
@@ -206,8 +218,7 @@ public class Mushroom {
       		if (print_verbose)
       		    System.out.printf("Applying a factor of %.2f noise.\n", noise);
 
-      		ArrayList<DataPoint> dsTrain = new ArrayList<DataPoint>();
-      		ArrayList<DataPoint> dsTests = new ArrayList<DataPoint>();
+      		
       		for (int i = 0; i < dataSet.size(); i++) {
       			if (Math.random() < training_proportion)
       				dsTrain.add(dataSet.get(i));
@@ -232,13 +243,11 @@ public class Mushroom {
 		}
 
 		// run all of the instances specified by the user
-		int prnt = 0;
-		if (print_verbose) prnt = 1;
 		System.out.println("training_dataset size: " + training_dataset.NDataPoints());
 		System.out.println("testing_dataset size:  " + testing_dataset.NDataPoints());
 
     	if (ada_boost) {
-    		AdaBoost boost = new AdaBoost(training_dataset, prnt);
+    		AdaBoost boost = new AdaBoost(training_dataset, print_verbose);
     		int[] output = boost.Classify(testing_dataset);
 
     		int right = 0;
@@ -259,7 +268,7 @@ public class Mushroom {
 	    	for (int i = 0; i < w.length; i++) {
 	    		w[i] = val;
 	    	}
-	    	DecisionStump stump = new DecisionStump(training_dataset, w, prnt);
+	    	DecisionStump stump = new DecisionStump(training_dataset, w, print_verbose);
 	    	int[] output = stump.Classify(testing_dataset);
 
 	    	int right = 0;
@@ -279,7 +288,7 @@ public class Mushroom {
 	    if (neural_network) {}
 	    if (random_forest) {}
 	    if (svm) {
-	    	SVM svm = new SVM(training_dataset, prnt);
+	    	SVM svm = new SVM(training_dataset, print_verbose);
 	    	int[] output = svm.Classify(testing_dataset);
 
 	    	int right = 0;
@@ -309,7 +318,7 @@ public class Mushroom {
 	    	double noise_max = 0.2;
 	    	double noise_stp = 0.05;
 
-	    	double[] noise = new double[(noise_max - noise_min)/noise_stp + 1];
+	    	double[] noise = new double[(int) ((noise_max - noise_min)/noise_stp) + 1];
 	    	for (int i = 0; i < noise.length; i++) {
 	    		noise[i] = noise_min + i*noise_stp;
 	    	}
@@ -320,9 +329,19 @@ public class Mushroom {
 
 			DataSet[] trainingSets = new DataSet[noise.length];
 			for (int i = 0; i < trainingSets.length; i++) {
-				ArrayList<DataPoint> pts = new ArrayList<DataPoint>();
-				if (Math.random() < noise[i]) {
-					DataPoint dp = 
+				for (int j = 0; j < data_points_train.length; j++){
+					ArrayList<DataPoint> pts = new ArrayList<DataPoint>();
+					if (Math.random() < noise[i]) {
+						DataPoint dp = new DataPoint(data_points_train[i].Attributes(), 
+													 1 - data_points_train[i].Label(), 
+													 data_points_train[i].isBinary());
+						pts.add(dp);
+					}
+					else {
+						DataPoint dp = new DataPoint(data_points_train[i]);
+						pts.add(dp);
+					}
+					trainingSets[i] = new DataSet(mapping, label_mapping, pts.toArray(new DataPoint[pts.size()]));
 				}
 			}
 
@@ -334,8 +353,10 @@ public class Mushroom {
 	    		Cs[i] = Math.pow(10, C_mag_min + i);
 	    	}
 	    	double alpha = 1.0e-4;
+
+
 	    	for (int i = 0; i < Cs.length; i++) {
-	    		SVM svm = new SVM(training_dataset, prnt, alpha, Cs[i]);
+	    		SVM svm = new SVM(training_dataset, print_verbose, alpha, Cs[i]);
 		    	int[] output = svm.Classify(testing_dataset);
 
 		    	int right = 0;

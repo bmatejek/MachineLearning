@@ -20,6 +20,53 @@ public class AdaBoost implements Learner {
   private DataSet training; // Pointer to the training dataset. 
   private final int learning_time = 30000; // (time in milliseconds)
 
+
+  // constructor for AdaBoost, boosting solely on Decision Stumps
+  public AdaBoost(DataSet train, boolean print_verbose) { 
+    this.print_verbose = print_verbose;
+    this.training = train;
+    // Set up local copy of training data and labels
+    this.X = new int[train.NDataPoints()][train.KthDataPoint(0).NAttributes()];
+    this.labels = new int[X.length];
+    for (int i = 0; i < X.length; i++) {
+      DataPoint temp = train.KthDataPoint(i);
+      labels[i] = temp.Label();
+      // Set each attribute for example i
+      for (int j = 0; j < X[0].length; j++) {
+        X[i][j] = temp.KthAttribute(j);
+      }
+    }
+
+    // Initialize weights
+    this.w = new double[X.length];
+    double val = 1.0 / this.w.length;
+    for (int i = 0; i < this.w.length; i++) {
+      this.w[i] = val;
+    }
+
+    // train on the DataSet
+    l  = new ArrayList<DecisionStump>();
+    al = new ArrayList<Double>();
+    missed = new boolean[this.labels.length];
+    this.err = Double.MAX_VALUE;
+    this.K   = Integer.MAX_VALUE;
+    //int asdf = 1;
+    Timer timer = new Timer(learning_time);
+    for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
+      DecisionStump DS = new DecisionStump(train, w, print_verbose);
+      double DS_err = this.getErr(DS);
+      //if (DS_err > 0.5) continue;
+      l.add(DS);
+      al.add(getAlpha(DS_err));
+      this.updateWeights(DS_err);
+      this.updateErr();
+      //System.out.println("AdaBoost error: " + this.err);
+      //asdf = 0;
+
+    }
+  }
+
+
   // Returns error rate of a particular candidate for the current weights
   // of the test samples. Error rate is simply the sum of misclassified 
   // weights. 
@@ -84,51 +131,6 @@ public class AdaBoost implements Learner {
       if (Math.abs(sum - 1.0) > 1.0e-10) {
         System.out.println("Weights sum to " + sum);
       }
-    }
-  }
-  
-  // constructor for AdaBoost, boosting solely on Decision Stumps
-  public AdaBoost(DataSet train, boolean print_verbose) { 
-    this.print_verbose = print_verbose;
-    this.training = train;
-    // Set up local copy of training data and labels
-    this.X = new int[train.NDataPoints()][train.KthDataPoint(0).NAttributes()];
-    this.labels = new int[X.length];
-    for (int i = 0; i < X.length; i++) {
-      DataPoint temp = train.KthDataPoint(i);
-      labels[i] = temp.Label();
-      // Set each attribute for example i
-      for (int j = 0; j < X[0].length; j++) {
-        X[i][j] = temp.KthAttribute(j);
-      }
-    }
-
-    // Initialize weights
-    this.w = new double[X.length];
-    double val = 1.0 / this.w.length;
-    for (int i = 0; i < this.w.length; i++) {
-      this.w[i] = val;
-    }
-
-    // train on the DataSet
-    l  = new ArrayList<DecisionStump>();
-    al = new ArrayList<Double>();
-    missed = new boolean[this.labels.length];
-    this.err = Double.MAX_VALUE;
-    this.K   = Integer.MAX_VALUE;
-    //int asdf = 1;
-    Timer timer = new Timer(learning_time);
-    for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
-      DecisionStump DS = new DecisionStump(train, w, print_verbose);
-      double DS_err = this.getErr(DS);
-      //if (DS_err > 0.5) continue;
-      l.add(DS);
-      al.add(getAlpha(DS_err));
-      this.updateWeights(DS_err);
-      this.updateErr();
-      //System.out.println("AdaBoost error: " + this.err);
-      //asdf = 0;
-
     }
   }
 
