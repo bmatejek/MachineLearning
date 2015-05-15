@@ -1,17 +1,20 @@
+package MachineLearning;
+
 public class DataSet {
   //  list of DataPoints
   private DataPoint integer_data_points[];
   private DataPoint binary_data_points[];
   private String mapping[][];
   private String label_mapping[];
+  private int[] n_classes_per_attribute;
     
   // constructor for the data set
   public DataSet(String mapping[][], String label_mapping[], DataPoint data_points[]) {
     int n_binary_attributes = 0;                               // number of binary attributes    
-    int n_classes_per_attribute[] = new int[mapping.length];   // number of classes per attribute
+    n_classes_per_attribute = new int[mapping.length];         // number of classes per attribute
     for (int i = 0; i < n_classes_per_attribute.length; ++i) 
       n_classes_per_attribute[i] = 0;
-                                            
+    
     // copy in the mapping array
     this.mapping = new String[mapping.length][];
     for (int i = 0; i < this.mapping.length; ++i) {
@@ -58,6 +61,30 @@ public class DataSet {
       binary_data_points[i] = new DataPoint(attributes, label, true);
     }
   }
+ 
+  // return the number of attributes
+  public int NAttributes() {
+    return mapping.length;
+  }
+  
+  public int NBinaryAttributes() {
+    return binary_data_points[0].NAttributes();
+  }
+  
+  // return the number of data points
+  public int NDataPoints() {
+    return integer_data_points.length;
+  }
+  
+  // return the maximum number of values for all attributes
+  public int MaxClassesInAttribute() {
+    return mapping[0].length - 1;
+  }
+  
+  // return the number of possible labels
+  public int NLabels() {
+    return label_mapping.length; 
+  }
   
   // functions to add in data points
   public DataPoint KthDataPoint(int k) {
@@ -68,6 +95,11 @@ public class DataSet {
     return new DataPoint(integer_data_points[k]);
   }
   
+  // return the kth attribute as a string
+  public String KthAttribute(int k) {
+    return mapping[k][0];
+  }
+  
   // return kth binary datapoint
   public DataPoint KthBinaryDataPoint(int k) {
     if (k >= binary_data_points.length || k < 0) {
@@ -75,6 +107,16 @@ public class DataSet {
       return null;
     }
     return new DataPoint(binary_data_points[k]);
+  }
+  
+  // return the number of classes for this attribute
+  public int NClassesKthAttribute(int k) {
+    return n_classes_per_attribute[k];
+  }
+  
+  // return the number of possible classes
+  public int NClasses() {
+    return label_mapping.length;
   }
   
   // print out the data set

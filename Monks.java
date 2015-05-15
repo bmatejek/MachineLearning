@@ -1,6 +1,14 @@
+package MachineLearning;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Vector;
+import MachineLearning.*;
+import MachineLearning.DecisionTree.*;
+import MachineLearning.NaiveBayes.*;
+import MachineLearning.NeuralNetwork.*;
+import MachineLearning.RandomForest.*;
+import MachineLearning.TreeBagging.*;
 
 public class Monks {
   // command line arguments
@@ -12,12 +20,13 @@ public class Monks {
   private static boolean neural_network = false;
   private static boolean random_forest = false;
   private static boolean svm = false;
+  private static boolean tree_bagging = false;
   private static boolean weighted_majority = false;
   private static double training_proportion = 0.0;
   private static double noise = 0.0;
   
   // array of training/testing file names
-  private static String path_location = "./data/monks/";
+  private static String path_location = "MachineLearning/data/monks/";
   private static String[] training_filenames = {"monks-1.train", "monks-2.train", "monks-3.train"};
   private static String[] testing_filenames = {"monks-1.test", "monks-2.test", "monks-3.test"};
   
@@ -74,6 +83,7 @@ public class Monks {
         else if (args[argv].equals("-NeuralNetwork")) neural_network = true;
         else if (args[argv].equals("-RandomForest")) random_forest = true;
         else if (args[argv].equals("-SVM")) svm = true;
+        else if (args[argv].equals("-TreeBagging")) tree_bagging = true;
         else if (args[argv].equals("-WeightedMajority")) weighted_majority = true;
         else if (args[argv].equals("-noise")) { 
           try { ++argv; noise = Double.parseDouble(args[argv]); }
@@ -89,7 +99,7 @@ public class Monks {
         System.err.printf("Error: Unrecognized argument %s.\n", args[argv]); return false;
       }
     }
-
+    
     // print out the level of noise
     if (print_verbose)
       System.out.printf("Applying a factor of %.2f noise.\n", noise);
@@ -107,7 +117,7 @@ public class Monks {
     int maxvalues = 0; // find the second dimension of the array
     for (int i = 0; i < nattributes; ++i)
       if (attribute_values[i].length > maxvalues)
-        maxvalues = attribute_values[i].length;
+      maxvalues = attribute_values[i].length;
     // create physical 2d array and fill in values
     String[][] mapping = new String[nattributes][maxvalues + 1];
     for (int i = 0; i < nattributes; ++i) {
@@ -143,13 +153,13 @@ public class Monks {
         }
       }
       catch (Exception e) {
-        System.err.printf("Error: failed to read %s\n.", training_filenames[i]);
+        System.err.printf("Error: failed to read %s.\n", training_filenames[i]);
         return;
       }
       // create this training data set
       training_datasets[i] = new DataSet(mapping, label_mapping, data_points.toArray(new DataPoint[data_points.size()]));
     }
-
+    
     // read in the testing data sets
     for (int i = 0; i < testing_filenames.length; ++i) {
       Vector<DataPoint> data_points  = new Vector<DataPoint>();
@@ -176,21 +186,102 @@ public class Monks {
         }
       }
       catch (Exception e) {
-        System.err.printf("Error: failed to read %s\n.", testing_filenames[i]);
+        System.err.printf("Error: failed to read %s.\n", testing_filenames[i]);
         return;
       }
       // create this training data set
       testing_datasets[i] = new DataSet(mapping, label_mapping, data_points.toArray(new DataPoint[data_points.size()]));
     }
-
+    
     // run all of the instances specified by the user
     if (ada_boost) {}
     if (decision_stump) {}
-    if (decision_tree) {}
-    if (naive_bayes) {}
-    if (neural_network) {}
-    if (random_forest) {}
+    if (decision_tree) { 
+      System.out.printf("Decision Tree:\n");
+      DecisionTree dt = new DecisionTree(training_datasets[0], print_verbose); 
+      int[] test = dt.Classify(testing_datasets[0]);
+      int[] ncorrect = new int[testing_datasets[0].NLabels()];
+      int[] noccurences  = new int[testing_datasets[0].NLabels()];
+      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+        int label = testing_datasets[0].KthDataPoint(i).Label();
+        if (test[i] == label) {
+          ncorrect[label]++;
+        }
+        noccurences[label]++;
+      }
+      for (int i = 0; i < ncorrect.length; ++i) {
+        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      }
+    }
+    if (naive_bayes) {
+      System.out.printf("Naive Bayes:\n");
+      NaiveBayes nb = new NaiveBayes(training_datasets[0], print_verbose);
+      int[] test = nb.Classify(testing_datasets[0]);
+      int[] ncorrect = new int[testing_datasets[0].NLabels()];
+      int[] noccurences = new int[testing_datasets[0].NLabels()];
+      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+        int label = testing_datasets[0].KthDataPoint(i).Label();
+        if (test[i] == label) {
+          ncorrect[label]++;
+        }
+        noccurences[label]++;
+      }
+      for (int i = 0; i < ncorrect.length; ++i) {
+        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      }
+    }
+    if (neural_network) {
+      System.out.printf("NeuralNetwork:\n");
+      NeuralNetwork nn = new NeuralNetwork(training_datasets[0], print_verbose);
+      int[] test = nn.Classify(testing_datasets[0]);
+      int[] ncorrect = new int[testing_datasets[0].NLabels()];
+      int[] noccurences = new int[testing_datasets[0].NLabels()];
+      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+        int label = testing_datasets[0].KthDataPoint(i).Label();
+        if (test[i] == label) {
+          ncorrect[label]++;
+        }
+        noccurences[label]++;
+      }
+      for (int i = 0; i < ncorrect.length; ++i) {
+        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      }
+    }
+    if (random_forest) {
+      System.out.printf("RandomForest:\n");
+      RandomForest rf = new RandomForest(training_datasets[0], print_verbose, 1000);
+      int[] test = rf.Classify(testing_datasets[0]);
+      int[] ncorrect = new int[testing_datasets[0].NLabels()];
+      int[] noccurences = new int[testing_datasets[0].NLabels()];
+      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+        int label = testing_datasets[0].KthDataPoint(i).Label();
+        if (test[i] == label) {
+          ncorrect[label]++;
+        }
+        noccurences[label]++;
+      }
+      for (int i = 0; i < ncorrect.length; ++i) {
+        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      }
+    }
     if (svm) {}
+    if (tree_bagging) {
+      System.out.printf("Tree Bagging:\n");
+      TreeBagging tb = new TreeBagging(training_datasets[0], print_verbose, 1000);
+      int[] test = tb.Classify(testing_datasets[0]);
+      int[] ncorrect = new int[testing_datasets[0].NLabels()];
+      int[] noccurences = new int[testing_datasets[0].NLabels()];
+      for (int i = 0; i < testing_datasets[0].NDataPoints(); ++i) {
+        int label = testing_datasets[0].KthDataPoint(i).Label();
+        if (test[i] == label) {
+          ncorrect[label]++;
+        }
+        noccurences[label]++;
+      }
+      for (int i = 0; i < ncorrect.length; ++i) {
+        System.out.println(ncorrect[i] + "/" + noccurences[i]);
+      }
+    }
     if (weighted_majority) {}
   }
 }
