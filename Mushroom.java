@@ -282,6 +282,7 @@ public class Mushroom {
 	    			wrong++;
 	    		}
 	    	}
+	    	System.out.println("right: " + right + "  wrong: " + wrong);
 	    	System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
 	    }
 	    if (weighted_majority) {}

@@ -5,9 +5,9 @@ import java.lang.management.ThreadMXBean;
 public class SVM implements Learner {
 
   private final int print_verbose;
-  private double alpha = 0.1; // Learning rate
+  private double alpha = 0.0001; // Learning rate
   private double C = 1.0; // weighting of training vs regularization
-  private double eps = 1.0e-10; // Accuracy for determining convergence 
+  private double eps = 1.0e-5; // Accuracy for determining convergence 
   private int convergence = 10; // number of updates less than eps wanted for convergence
   private final int learning_time = 600000; // (10 minutes)
   private int[][] X;  // Training set
@@ -113,6 +113,10 @@ public class SVM implements Learner {
       if (Math.abs(del) > max) max = Math.abs(del);
       this.theta[i] += del;
     }
+    // for (int i = 0; i < this.theta.length/8; i++) {
+    //   System.out.printf("%3.2f, ", theta[i]);
+    // }
+    // System.out.println();
     return max;
   }
 
@@ -121,10 +125,10 @@ public class SVM implements Learner {
     this.print_verbose = print_verbose;
 
     // Set up local copy of training data and labels
-    this.X = new int[train.NDataPoints()][train.KthDataPoint(0).NAttributes()];
+    this.X = new int[train.NDataPoints()][train.KthBinaryDataPoint(0).NAttributes()];
     this.labels = new int[X.length];
     for (int i = 0; i < X.length; i++) {
-      DataPoint temp = train.KthDataPoint(i);
+      DataPoint temp = train.KthBinaryDataPoint(i);
       labels[i] = temp.Label();
       for (int j = 0; j < X[0].length; j++) {
         X[i][j] = temp.KthAttribute(j);
@@ -137,10 +141,13 @@ public class SVM implements Learner {
     // train on the DataSet 
     Timer timer = new Timer(learning_time);
     int run = 0;
-    while (run < convergence && timer.getTimeRemaining() >= 0) {
+    int temp = 0;
+    while (temp < 200000 && run < convergence && timer.getTimeRemaining() >= 0) {
       if (this.gradient_step() < this.eps) run++;
       else run = 0;
+      temp++;
     }
+    System.out.println(temp);
   }
   
   /*
@@ -160,7 +167,7 @@ public class SVM implements Learner {
   public int[] Classify(DataSet test) {
     int[] ret = new int[test.NDataPoints()];
     for (int i = 0; i < ret.length; i++) {
-      DataPoint dp = test.KthDataPoint(i);
+      DataPoint dp = test.KthBinaryDataPoint(i);
       int[] x = new int[dp.NAttributes()];
       for (int j = 0; j < x.length; j++) {
         x[j] = dp.KthAttribute(j);
