@@ -8,6 +8,7 @@ public class DecisionStump implements Learner {
   private int[] labels; // Training set labels
   
   private double B(double q) {
+    if (q == 0.0) return 0.0;
     return (q * Math.log(q) + (1.0 - q) * Math.log(1.0 - q)) / Math.log(0.5);
   }
 
@@ -82,13 +83,24 @@ public class DecisionStump implements Learner {
     // and more with 1 are labeled the other. Thus, find what way zero goes.
     // Assumption is that 1 goes  the opposite way. 
     this.decision_attribute = maxGainIndex;
-    if (counts[p0][maxGainIndex] > counts[n0][maxGainIndex])
-      this.decision_direction = 0; // 0 attribute yields more positive (1) labels
-    else 
-      this.decision_direction = 1; // 0 attribute yields more negative (0) labels
-    // Assumption is then that 1 attribute yields more negative (0) labels and 
-    //                         1 attribute yields more positive (1) labels
-    //  respectively. 
+    if (Math.abs(counts[p0][maxGainIndex] - counts[n0][maxGainIndex])
+        > Math.abs(counts[p1][maxGainIndex] - counts[n1][maxGainIndex])) {
+      if (counts[p0][maxGainIndex] > counts[n0][maxGainIndex]) {
+        this.decision_direction = 0; // 0 attribute yields more 1 labels
+      }
+      else {
+        this.decision_direction = 1; // 0 attribute yields more 0 labels
+      }
+    }
+    else {
+      if (counts[p1][maxGainIndex] > counts[n1][maxGainIndex]) {
+        this.decision_direction = 1; // 1 attribute yields more 1 labels
+      }
+      else {
+        this.decision_direction = 0; // 1 attribute yields more 0 labels
+      }
+    }
+    
 
 
     if (print_verbose == 1) {

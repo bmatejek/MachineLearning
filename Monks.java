@@ -145,7 +145,8 @@ public class Monks {
     // read in the training data sets
     for (int i = 0; i < training_filenames.length; ++i) {
       Vector<DataPoint> data_points  = new Vector<DataPoint>();
-      try (BufferedReader training_br = new BufferedReader(new FileReader(path_location + training_filenames[i]))) {
+      try {
+        BufferedReader training_br = new BufferedReader(new FileReader(path_location + training_filenames[i]));
         String line;
         while ((line = training_br.readLine()) != null) {
           String[] parse_attributes = line.split(" ");
@@ -178,7 +179,8 @@ public class Monks {
     // read in the testing data sets
     for (int i = 0; i < testing_filenames.length; ++i) {
       Vector<DataPoint> data_points  = new Vector<DataPoint>();
-      try (BufferedReader testing_br = new BufferedReader(new FileReader(path_location + testing_filenames[i]))) {
+      try {
+        BufferedReader testing_br = new BufferedReader(new FileReader(path_location + testing_filenames[i]));
         String line;
         while ((line = testing_br.readLine()) != null) {
           String[] parse_attributes = line.split(" ");

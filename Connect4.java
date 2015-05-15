@@ -16,7 +16,7 @@ public class Connect4 {
 	private static boolean random_forest = false;
 	private static boolean svm = false;
 	private static boolean weighted_majority = false;
-	private static double training_proportion = 0.01;
+	private static double training_proportion = 0.2;
 	private static double noise = 0.0;
 
 
@@ -153,7 +153,7 @@ public class Connect4 {
 
     	if (ada_boost) {
     		AdaBoost boost = new AdaBoost(training_dataset, prnt);
-    		int[] output = boost.Classify(training_dataset);
+    		int[] output = boost.Classify(testing_dataset);
 
     		int right = 0;
     		int wrong = 0;

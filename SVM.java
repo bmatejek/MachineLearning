@@ -16,6 +16,43 @@ public class SVM implements Learner {
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients
 
+
+  
+
+  // constructors for SVM
+  public SVM(DataSet train, int print_verbose, double a, double c) {
+    this(train, print_verbose);
+    this.alpha = a;
+    this.C = c;
+  }
+
+  public SVM(DataSet train, int print_verbose) { 
+    this.print_verbose = print_verbose;
+
+    // Set up local copy of training data and labels
+    this.X = new int[train.NDataPoints()][train.KthBinaryDataPoint(0).NAttributes()];
+    this.labels = new int[X.length];
+    for (int i = 0; i < X.length; i++) {
+      DataPoint temp = train.KthBinaryDataPoint(i);
+      labels[i] = temp.Label();
+      for (int j = 0; j < X[0].length; j++) {
+        X[i][j] = temp.KthAttribute(j);
+      }
+    }
+
+    // Should this be initialized randomly with something nonzero?
+    this.theta = new double[X[0].length]; 
+    
+    // train on the DataSet 
+    Timer timer = new Timer(learning_time);
+    int run = 0;
+    while (run < convergence && timer.getTimeRemaining() >= 0) {
+      if (this.gradient_step() < this.eps) run++;
+      else run = 0;
+    }
+  }
+
+
   // Gives the inner product of ith training example with theta
   private double theta_x_inner(int i) {
     double ret = 0.0;
@@ -122,32 +159,7 @@ public class SVM implements Learner {
     return max;
   }
 
-  // constructor for SVM
-  public SVM(DataSet train, int print_verbose) { 
-    this.print_verbose = print_verbose;
-
-    // Set up local copy of training data and labels
-    this.X = new int[train.NDataPoints()][train.KthBinaryDataPoint(0).NAttributes()];
-    this.labels = new int[X.length];
-    for (int i = 0; i < X.length; i++) {
-      DataPoint temp = train.KthBinaryDataPoint(i);
-      labels[i] = temp.Label();
-      for (int j = 0; j < X[0].length; j++) {
-        X[i][j] = temp.KthAttribute(j);
-      }
-    }
-
-    // Should this be initialized randomly with something nonzero?
-    this.theta = new double[X[0].length]; 
-    
-    // train on the DataSet 
-    Timer timer = new Timer(learning_time);
-    int run = 0;
-    while (run < convergence && timer.getTimeRemaining() >= 0) {
-      if (this.gradient_step() < this.eps) run++;
-      else run = 0;
-    }
-  }
+  
   
   /*
   *  Hypothesis function (BINARY)
