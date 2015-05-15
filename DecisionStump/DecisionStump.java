@@ -1,7 +1,9 @@
-package MachineLearning;
+package MachineLearning.DecisionStump;
+
+import MachineLearning.*;
 
 public class DecisionStump implements Learner {
-  private final int print_verbose;
+  private final boolean print_verbose;
   private int decision_attribute; // index of attribute used to make decision
   private int decision_direction; // value corresponding to 0 in decision_attribute
   private int[][] X; // Training Set
@@ -15,7 +17,7 @@ public class DecisionStump implements Learner {
   // constructor for DecisionStump
   // THIS IS MADE FOR BINARY DATA
   // w gives weights of each example
-  public DecisionStump(DataSet train, double[] w, int print_verbose) { 
+  public DecisionStump(DataSet train, double[] w, boolean print_verbose) { 
     this.print_verbose = print_verbose;
     assert w.length == train.NDataPoints();
 
@@ -103,7 +105,7 @@ public class DecisionStump implements Learner {
     
 
 
-    if (print_verbose == 1) {
+    if (print_verbose) {
       System.out.println("Splitting on attribute " + this.decision_attribute + ".");
       System.out.println("Instances with value " + this.decision_direction + " are labeled 1.");
     }

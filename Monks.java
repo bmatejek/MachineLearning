@@ -285,7 +285,6 @@ public class Monks {
       }
       if (neural_network) {
         System.out.printf("Neural Network:\n");
-        int k = 0;
         NeuralNetwork nn = new NeuralNetwork(training_datasets[k], print_verbose);
         int[] test = nn.Classify(testing_datasets[k]);
         int[] ncorrect = new int[testing_datasets[k].NLabels()];

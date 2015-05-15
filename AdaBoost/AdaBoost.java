@@ -1,12 +1,13 @@
-package MachineLearning;
+package MachineLearning.AdaBoost;
 
 import java.util.ArrayList;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-
+import MachineLearning.*;
+import MachineLearning.DecisionStump.*;
 
 public class AdaBoost implements Learner {
-  private final int print_verbose;
+  private final boolean print_verbose;
   private double eps = 1.0e-10; // Accuracy of error rate for convergence
   private int K; // Number of hypotheses
   private int[][] X; // Training examples
@@ -50,7 +51,7 @@ public class AdaBoost implements Learner {
         missed[i] = false;
       }
     }
-    if (this.print_verbose == 1 && errorWeight > this.err){
+    if (this.print_verbose && errorWeight > this.err){
       System.out.printf("Increase in full hypothesis error rate from %f to %f\n", this.err, errorWeight);
     }
     this.err = errorWeight;
@@ -75,7 +76,7 @@ public class AdaBoost implements Learner {
         //w[i] *= Math.exp(-1.0 * al.get(al.size()-1)); UNNORMALIZED
       }
     }
-    if (print_verbose == 1) {
+    if (print_verbose) {
       double sum = 0.0;
       for (int i = 0; i < this.w.length; i++) {
         sum += w[i];
@@ -87,7 +88,7 @@ public class AdaBoost implements Learner {
   }
   
   // constructor for AdaBoost, boosting solely on Decision Stumps
-  public AdaBoost(DataSet train, int print_verbose) { 
+  public AdaBoost(DataSet train, boolean print_verbose) { 
     this.print_verbose = print_verbose;
     this.training = train;
     // Set up local copy of training data and labels

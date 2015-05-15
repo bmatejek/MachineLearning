@@ -1,12 +1,14 @@
-package MachineLearning;
+package MachineLearning.SVM;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
+import MachineLearning.*;
+
 
 public class SVM implements Learner {
 
-  private final int print_verbose;
+  private final boolean print_verbose;
   private double alpha = 0.0001; // Learning rate
   private double C = 1.0; // weighting of training vs regularization
   private double eps = 1.0e-5; // Accuracy for determining convergence 
@@ -20,13 +22,13 @@ public class SVM implements Learner {
   
 
   // constructors for SVM
-  public SVM(DataSet train, int print_verbose, double a, double c) {
+  public SVM(DataSet train, boolean print_verbose, double a, double c) {
     this(train, print_verbose);
     this.alpha = a;
     this.C = c;
   }
 
-  public SVM(DataSet train, int print_verbose) { 
+  public SVM(DataSet train, boolean print_verbose) { 
     this.print_verbose = print_verbose;
 
     // Set up local copy of training data and labels
