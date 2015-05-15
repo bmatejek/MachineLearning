@@ -1,3 +1,5 @@
+package MachineLearning;
+
 public class DataPoint {
   private int[] attributes;  // list of attributes
   private int label;         // class label of this data point

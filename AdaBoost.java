@@ -1,4 +1,9 @@
+package MachineLearning;
+
 import java.util.ArrayList;
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+
 
 public class AdaBoost implements Learner {
   private final int print_verbose;
@@ -12,6 +17,7 @@ public class AdaBoost implements Learner {
   private ArrayList<Double> al; // Classifier weights
   private double err; // Error rate of full ensemble
   private DataSet training; // Pointer to the training dataset. 
+  private final int learning_time = 30000; // (time in milliseconds)
 
   // Returns error rate of a particular candidate for the current weights
   // of the test samples. Error rate is simply the sum of misclassified 
@@ -110,14 +116,16 @@ public class AdaBoost implements Learner {
     this.err = Double.MAX_VALUE;
     this.K   = Integer.MAX_VALUE;
     //int asdf = 1;
-    for (int i = 0; i < this.K && this.err > this.eps; i++) {
+    Timer timer = new Timer(learning_time);
+    for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
       DecisionStump DS = new DecisionStump(train, w, print_verbose);
       double DS_err = this.getErr(DS);
-      if (DS_err > 0.5) break;
+      if (DS_err > 0.5) continue;
       l.add(DS);
       al.add(getAlpha(DS_err));
       this.updateWeights(DS_err);
       this.updateErr();
+      //System.out.println("AdaBoost error: " + this.err);
       //asdf = 0;
 
     }
@@ -148,6 +156,36 @@ public class AdaBoost implements Learner {
     }
     return ret;
   }
+
+  // Borrowed from assignment 2, COS402, Fall 2014, timer class
+  private class Timer {
+    public Timer(long max_time) {
+      tb = ManagementFactory.getThreadMXBean();
+        cpu_time = tb.isThreadCpuTimeSupported();
+        start_time = get_time();
+        end_time = start_time + max_time;
+    }
+    public long getTimeElapsed() {
+        return (get_time() - start_time);
+    }
+
+    public long getTimeRemaining() {
+        return (end_time - get_time());
+    }
+
+    private long start_time, end_time;
+    private static final long milli_to_nano = 1000000;
+    private ThreadMXBean tb;
+    private boolean cpu_time;
+
+    private long get_time() {
+        if (cpu_time)
+            return tb.getCurrentThreadCpuTime() / milli_to_nano;
+        else
+            return System.currentTimeMillis();
+    }
+  }
+
 }
 
 

@@ -1,3 +1,6 @@
+package MachineLearning;
+
+
 /*****************************************************************************/
 /*                                                                           */
 /*  Theodore O. Brundage                                                     */
@@ -28,12 +31,12 @@ public class Mushroom {
 	private static boolean random_forest = false;
 	private static boolean svm = false;
 	private static boolean weighted_majority = false;
-	private static double training_proportion = 0.1;
+	private static double training_proportion = 0.001;
 	private static double noise = 0.0;
 
 
 	// array of training/testing file names
-	private static String path_location = "./data/mushroom/";
+	private static String path_location = "./MachineLearning/data/mushroom/";
 	private static String fileName = "agaricus-lepiota";
 	
 
@@ -227,8 +230,13 @@ public class Mushroom {
 		}
 
 		// run all of the instances specified by the user
+		int prnt = 0;
+		if (print_verbose) prnt = 1;
+		System.out.println("training_dataset size: " + training_dataset.NDataPoints());
+		System.out.println("testing_dataset size:  " + testing_dataset.NDataPoints());
+
     	if (ada_boost) {
-    		AdaBoost boost = new AdaBoost(training_dataset, 1);
+    		AdaBoost boost = new AdaBoost(training_dataset, prnt);
     		int[] output = boost.Classify(testing_dataset);
 
     		int right = 0;
@@ -241,7 +249,7 @@ public class Mushroom {
     				wrong++;
     			}
     		}
-    		System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+    		System.out.println("AdaBoost Error Rate: " + ((double) wrong / (wrong + right)));
     	}
     	if (decision_stump) {
     		double[] w = new double[training_dataset.NDataPoints()];
@@ -249,7 +257,7 @@ public class Mushroom {
 	    	for (int i = 0; i < w.length; i++) {
 	    		w[i] = val;
 	    	}
-	    	DecisionStump stump = new DecisionStump(training_dataset, w, 1);
+	    	DecisionStump stump = new DecisionStump(training_dataset, w, prnt);
 	    	int[] output = stump.Classify(testing_dataset);
 
 	    	int right = 0;
@@ -262,14 +270,14 @@ public class Mushroom {
 	    			wrong++;
 	    		}
 	    	}
-	    	System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+	    	System.out.println("Decision Stump Error Rate: " + ((double) wrong / (wrong + right)));
 	    }
 	    if (decision_tree) {}
 	    if (naive_bayes) {}
 	    if (neural_network) {}
 	    if (random_forest) {}
 	    if (svm) {
-	    	SVM svm = new SVM(training_dataset, 1);
+	    	SVM svm = new SVM(training_dataset, prnt);
 	    	int[] output = svm.Classify(testing_dataset);
 
 	    	int right = 0;
@@ -282,8 +290,7 @@ public class Mushroom {
 	    			wrong++;
 	    		}
 	    	}
-	    	System.out.println("right: " + right + "  wrong: " + wrong);
-	    	System.out.println("Error Rate: " + ((double) wrong / (wrong + right)));
+	    	System.out.println("SVM Error Rate: " + ((double) wrong / (wrong + right)));
 	    }
 	    if (weighted_majority) {}
 
