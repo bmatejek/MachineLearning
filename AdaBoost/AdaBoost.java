@@ -8,7 +8,7 @@ import MachineLearning.DecisionStump.*;
 
 public class AdaBoost implements Learner {
   private final boolean print_verbose;
-  private double eps = 1.0e-10; // Accuracy of error rate for convergence
+  private double eps = 1.0e-4; // Accuracy of error rate for convergence
   private int K; // Number of hypotheses
   private int[][] X; // Training examples
   private int[] labels; // Training example labels
@@ -18,7 +18,7 @@ public class AdaBoost implements Learner {
   private ArrayList<Double> al; // Classifier weights
   private double err; // Error rate of full ensemble
   private DataSet training; // Pointer to the training dataset. 
-  private final int learning_time = 30000; // (time in milliseconds)
+  private final int learning_time = 600000; // (time in milliseconds)
 
 
   // constructor for AdaBoost, boosting solely on Decision Stumps
@@ -53,13 +53,17 @@ public class AdaBoost implements Learner {
     //int asdf = 1;
     Timer timer = new Timer(learning_time);
     for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
-      DecisionStump DS = new DecisionStump(train, w, print_verbose);
+      DecisionStump DS = new DecisionStump(train, this.w, print_verbose);
       double DS_err = this.getErr(DS);
-      //if (DS_err > 0.5) continue;
+      if (DS_err - 0.5 > 1.0e-10) {
+        System.out.println("stump error too high: " + DS_err);
+        break;
+      }
       l.add(DS);
       al.add(getAlpha(DS_err));
       this.updateWeights(DS_err);
       this.updateErr();
+      System.out.printf("%4d:  %15f\n", i, this.err);
       //System.out.println("AdaBoost error: " + this.err);
       //asdf = 0;
 
@@ -92,20 +96,21 @@ public class AdaBoost implements Learner {
     for (int i = 0; i < predictions.length; i++) {
       if (predictions[i] != labels[i]) {
         errorWeight += w[i];
-        missed[i] = true;
+       // missed[i] = true;
       }
-      else {
-        missed[i] = false;
-      }
+      // else {
+      //   missed[i] = false;
+      // }
     }
     if (this.print_verbose && errorWeight > this.err){
       System.out.printf("Increase in full hypothesis error rate from %f to %f\n", this.err, errorWeight);
     }
     this.err = errorWeight;
   }
+  
 
   private double getAlpha(double error) {
-    return 0.5 * (Math.log(1 - error) - Math.log(error)) / Math.log(Math.E);
+    return 0.5 * Math.log((1 - error)/error);
   }
 
   // private double getNorm() {
@@ -113,23 +118,30 @@ public class AdaBoost implements Learner {
   // }
 
   private void updateWeights(double error) {
+    double sum = 0.0;
     for (int i = 0; i < this.w.length; i++) {
       if (this.missed[i]) {
-        w[i] = 0.5 * w[i] / error;
-        // w[i] *= Math.exp(al.get(al.size()-1)); UNNORMALIZED
-      }
-      else {
-        w[i] = 0.5 * w[i] / (1.0 - error);
-        //w[i] *= Math.exp(-1.0 * al.get(al.size()-1)); UNNORMALIZED
-      }
-    }
-    if (print_verbose) {
-      double sum = 0.0;
-      for (int i = 0; i < this.w.length; i++) {
+        //[i] = 0.5 * w[i] / error;
+        w[i] *= Math.exp(al.get(al.size()-1)); 
         sum += w[i];
       }
-      if (Math.abs(sum - 1.0) > 1.0e-10) {
-        System.out.println("Weights sum to " + sum);
+      else {
+        //w[i] = 0.5 * w[i] / (1.0 - error);
+        w[i] *= Math.exp(-1.0 * al.get(al.size()-1));
+        sum += w[i];
+      }
+    }
+    for (int i = 0; i < this.w.length; i++) {
+      w[i] /= sum;
+    }
+
+    if (print_verbose) {
+      double total = 0.0;
+      for (int i = 0; i < this.w.length; i++) {
+        total += w[i];
+      }
+      if (Math.abs(total - 1.0) > 1.0e-10) {
+        System.out.println("Weights sum to " + total);
       }
     }
   }

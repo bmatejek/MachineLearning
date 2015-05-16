@@ -8,12 +8,15 @@ import MachineLearning.*;
 
 public class SVM implements Learner {
 
+  private static double ALPHA_DEFAULT = 1.0e-4;
+  private static double C_DEFAULT = 1.0;
+
   private final boolean print_verbose;
   private double alpha = 0.0001; // Learning rate
   private double C = 1.0; // weighting of training vs regularization
-  private double eps = 1.0e-5; // Accuracy for determining convergence 
+  private double eps = 1.0e-15; // Accuracy for determining convergence 
   private int convergence = 10; // number of updates less than eps wanted for convergence
-  private final int learning_time = 30000; // (time in milliseconds)
+  private final int learning_time = 60000; // (time in milliseconds)
   private int[][] X;  // Training set
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients
@@ -23,13 +26,10 @@ public class SVM implements Learner {
 
   // constructors for SVM
   public SVM(DataSet train, boolean print_verbose, double a, double c) {
-    this(train, print_verbose);
+    this.print_verbose = print_verbose;
+
     this.alpha = a;
     this.C = c;
-  }
-
-  public SVM(DataSet train, boolean print_verbose) { 
-    this.print_verbose = print_verbose;
 
     // Set up local copy of training data and labels
     this.X = new int[train.NDataPoints()][train.KthBinaryDataPoint(0).NAttributes()];
@@ -41,7 +41,6 @@ public class SVM implements Learner {
         X[i][j] = temp.KthAttribute(j);
       }
     }
-
     // Should this be initialized randomly with something nonzero?
     this.theta = new double[X[0].length]; 
     
@@ -53,6 +52,13 @@ public class SVM implements Learner {
       else run = 0;
     }
   }
+
+  public SVM(DataSet train, boolean print_verbose) { 
+    this(train, print_verbose, ALPHA_DEFAULT, C_DEFAULT);
+  }
+
+   
+  
 
 
   // Gives the inner product of ith training example with theta
@@ -134,7 +140,6 @@ public class SVM implements Learner {
         else continue;
       }
     }
-
     // Gradient due to regularization term
     for (int i = 0; i < this.theta.length; i++) {
       ret[i] += this.theta[i];
