@@ -83,7 +83,7 @@ public class GenerateMonks {
   }
   
   private static int FunctionEight(int[] a) {
-    if (a[9] > a[8]) return 1;
+    if (a[9] > a[8] && (a[7] == 2 || a[6] == 3)) return 1;
     else return 0;
   }
   

@@ -101,7 +101,7 @@ public class TestRandomForest {
         return;
       }
       
-      int training_size = (int) (data_points.size() * 0.5);
+      int training_size = (int) (data_points.size() * 0.01);
       int testing_size = data_points.size() - training_size;
       
       List<DataPoint> training_data_points = data_points.subList(0, training_size);
