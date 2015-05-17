@@ -16,7 +16,7 @@ public class SVM implements Learner {
   private double C = 1.0; // weighting of training vs regularization
   private double eps = 1.0e-15; // Accuracy for determining convergence 
   private int convergence = 10; // number of updates less than eps wanted for convergence
-  private final int learning_time = 10000; // (time in milliseconds)
+  private final int learning_time = 60000; // (time in milliseconds)
   private int[][] X;  // Training set
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients

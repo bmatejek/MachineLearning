@@ -481,7 +481,7 @@ public class Mushroom {
 		    	//double[] Cs = {1.0e-6, 1.0, 1.0e6};
 
 		    	for (int i = 0; i < trainingSets.length; i++) {
-		    		
+		    		System.out.printf("%15e    ", noise[i]);
 		    		for (int j = 0; j < Cs.length; j++) {
 			    		SVM svm = new SVM(trainingSets[i], print_verbose, alpha, Cs[j]);
 				    	int[] output = svm.Classify(testing_dataset);
@@ -497,18 +497,19 @@ public class Mushroom {
 				    		}
 				    	}
 				    	results[i][j] += ((double) wrong / (wrong + right)) / reps;
-				    	
+				    	System.out.printf("%15e    ", results[i][j]);
 				    	//System.out.println("SVM Error Rate (C = " + Cs[i] + ", noise = " + noise[j] + "): " + ((double) wrong / (wrong + right)));
 			    	}
+			    	System.out.println();
 			    }
 			}
-			for (int i = 0; i < results.length; i++) {
-				System.out.printf("%15e    ", noise[i]);
-				for (int j = 0; j < results[0].length; j++) {
-					System.out.printf("%15e    ", results[i][j]);
-				}
-				System.out.println();
-			}
+			// for (int i = 0; i < results.length; i++) {
+			// 	System.out.printf("%15e    ", noise[i]);
+			// 	for (int j = 0; j < results[0].length; j++) {
+			// 		System.out.printf("%15e    ", results[i][j]);
+			// 	}
+			// 	System.out.println();
+			// }
 
 	    }
 
