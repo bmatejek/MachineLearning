@@ -10,6 +10,7 @@ public class AdaBoost implements Learner {
   private final boolean print_verbose;
   private double eps = 1.0e-4; // Accuracy of error rate for convergence
   private int K; // Number of hypotheses
+  private static final int K_DEFAULT_VALUE = 1000;
   private int[][] X; // Training examples
   private int[] labels; // Training example labels
   private boolean[] missed; // Misclassified examples on this round
@@ -21,8 +22,17 @@ public class AdaBoost implements Learner {
   private final int learning_time = 600000; // (time in milliseconds)
 
 
-  // constructor for AdaBoost, boosting solely on Decision Stumps
-  public AdaBoost(DataSet train, boolean print_verbose) { 
+  // constructors for AdaBoost, boosting solely on Decision Stumps
+  public AdaBoost(DataSet train, DataSet test, int k) {
+    this(train, false, k, test);
+  }
+
+  public AdaBoost(DataSet train, boolean print_verbose) {
+    this(train, print_verbose, K_DEFAULT_VALUE, null);
+  }
+
+  public AdaBoost(DataSet train, boolean print_verbose, int learners, DataSet test) { 
+    this.K = learners;
     this.print_verbose = print_verbose;
     this.training = train;
     // Set up local copy of training data and labels
@@ -49,13 +59,11 @@ public class AdaBoost implements Learner {
     al = new ArrayList<Double>();
     missed = new boolean[this.labels.length];
     this.err = Double.MAX_VALUE;
-    this.K   = Integer.MAX_VALUE;
-    //int asdf = 1;
     Timer timer = new Timer(learning_time);
     for (int i = 0; i < this.K && this.err > this.eps && timer.getTimeRemaining() >= 0; i++) {
       DecisionStump DS = new DecisionStump(train, this.w, print_verbose);
       double DS_err = this.getErr(DS);
-      if (DS_err - 0.5 > 1.0e-10) {
+      if (print_verbose && DS_err > 0.5) {
         System.out.println("stump error too high: " + DS_err);
         break;
       }
@@ -63,14 +71,31 @@ public class AdaBoost implements Learner {
       al.add(getAlpha(DS_err));
       this.updateWeights(DS_err);
       this.updateErr();
-      System.out.printf("%4d:  %15f\n", i, this.err);
-      //System.out.println("AdaBoost error: " + this.err);
-      //asdf = 0;
-
+      if (test != null) {
+        int[] output = this.Classify(test);
+        int right = 0;
+        int wrong = 0;
+        for (int j = 0; j < output.length; j++) {
+          if (output[j] == test.KthBinaryDataPoint(j).Label()) {
+            right++;
+          }
+          else {
+            wrong++;
+          }
+        }
+        if (l.size() % 50 == 0) {
+          System.out.printf("%15f   ", ((double) wrong / (wrong + right)));
+        }
+      }
+      
     }
+     System.out.printf("Final training error:  %15f\n", this.err);
+    
   }
 
-
+  public int NLearners() {
+    return this.l.size();
+  }
   // Returns error rate of a particular candidate for the current weights
   // of the test samples. Error rate is simply the sum of misclassified 
   // weights. 
@@ -118,29 +143,29 @@ public class AdaBoost implements Learner {
   // }
 
   private void updateWeights(double error) {
-    double sum = 0.0;
+    //double sum = 0.0;
     for (int i = 0; i < this.w.length; i++) {
       if (this.missed[i]) {
-        //[i] = 0.5 * w[i] / error;
-        w[i] *= Math.exp(al.get(al.size()-1)); 
-        sum += w[i];
+        w[i] = 0.5 * w[i] / error;
+        //w[i] *= Math.exp(al.get(al.size()-1)); 
+        //sum += w[i];
       }
       else {
-        //w[i] = 0.5 * w[i] / (1.0 - error);
-        w[i] *= Math.exp(-1.0 * al.get(al.size()-1));
-        sum += w[i];
+        w[i] = 0.5 * w[i] / (1.0 - error);
+        //w[i] *= Math.exp(-1.0 * al.get(al.size()-1));
+        //sum += w[i];
       }
     }
-    for (int i = 0; i < this.w.length; i++) {
-      w[i] /= sum;
-    }
+    // for (int i = 0; i < this.w.length; i++) {
+    //   w[i] /= sum;
+    // }
 
     if (print_verbose) {
       double total = 0.0;
       for (int i = 0; i < this.w.length; i++) {
         total += w[i];
       }
-      if (Math.abs(total - 1.0) > 1.0e-10) {
+      if (print_verbose && Math.abs(total - 1.0) > 1.0e-10) {
         System.out.println("Weights sum to " + total);
       }
     }

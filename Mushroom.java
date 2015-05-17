@@ -268,6 +268,7 @@ public class Mushroom {
     		System.out.println("AdaBoost Error Rate: " + ((double) wrong / (wrong + right)));
     	}
     	if (ada_boost_p_k) {
+    		int runs = 10;
     		double tp_min = 0.0;
     		double tp_max = .95;
     		double tp_step = 0.05;
@@ -277,38 +278,80 @@ public class Mushroom {
     			else tp[i] = tp_min + i * tp_step;
     		}
 
-
-      		DataSet[] TrainSets = new DataSet[tp.length];
-      		DataSet[] TestSets = new DataSet[tp.length];
-    		for (int i = 0; i < tp.length; i++) {
-    			dsTrain = new ArrayList<DataPoint>();
-      			dsTests = new ArrayList<DataPoint>();
-		    	for (int j = 0; j < dataSet.size(); j++) {
-	      			if (Math.random() < training_proportion)
-	      				dsTrain.add(dataSet.get(j));
-	      			else {
-	      				dsTests.add(dataSet.get(j));
-	      			}
-	      		}
-	      		TrainSets[i] = new DataSet(mapping,label_mapping, dsTrain.toArray(new DataPoint[dsTrain.size()]));
-	      		TestSets[i]  = new DataSet(mapping,label_mapping, dsTests.toArray(new DataPoint[dsTests.size()]));
-	      	}
-
-	    	
-	    	AdaBoost boost = new AdaBoost(training_dataset, print_verbose);
-    		int[] output = boost.Classify(testing_dataset);
-
-    		int right = 0;
-    		int wrong = 0;
-    		for (int i = 0; i < output.length; i++) {
-    			if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
-    				right++;
-    			}
-    			else {
-    				wrong++;
-    			}
+    		int K = 1000;
+    		System.out.println("For Performance on Testing Sets, function of K, p = 0.1");
+    		double[] results = new double[runs];
+    		for (int i = 1; i <= K; i++) {
+    			System.out.printf("%15d   ", i);
     		}
-    		System.out.println("Final AdaBoost Error Rate: " + ((double) wrong / (wrong + right)));
+    		System.out.println();
+    		for (int n = 0; n < runs; n++) {
+				ArrayList<DataPoint> trainingPoints = new ArrayList<DataPoint>();
+				ArrayList<DataPoint> testingPoints = new ArrayList<DataPoint>();
+				for (int i = 0; i < dataSet.size(); i++) {
+					if (Math.random() < training_proportion) {
+						trainingPoints.add(dataSet.get(i));
+					}
+					else {
+						testingPoints.add(dataSet.get(i));
+					}
+				}
+
+    			AdaBoost boost = new AdaBoost(new DataSet(mapping,label_mapping,trainingPoints.toArray(new DataPoint[trainingPoints.size()])),
+    				                          new DataSet(mapping,label_mapping,testingPoints.toArray(new DataPoint[testingPoints.size()])), K);
+    			System.out.println();
+    		}
+
+
+    		// System.out.println("For Performance on Training Set, function of TP");
+    		// double[] results = new double[tp.length];
+    		// for (int n = 0; n < runs; n++) {
+	     //  		DataSet[] TrainSets = new DataSet[tp.length];
+	     //  		DataSet[] TestSets = new DataSet[tp.length];
+	    	// 	for (int i = 0; i < tp.length; i++) {
+	    	// 		dsTrain = new ArrayList<DataPoint>();
+	     //  			dsTests = new ArrayList<DataPoint>();
+			   //  	for (int j = 0; j < dataSet.size(); j++) {
+		    //   			if (Math.random() < tp[i])
+		    //   				dsTrain.add(dataSet.get(j));
+		    //   			else {
+		    //   				dsTests.add(dataSet.get(j));
+		    //   			}
+		    //   		}
+		    //   		TrainSets[i] = new DataSet(mapping,label_mapping, dsTrain.toArray(new DataPoint[dsTrain.size()]));
+		    //   		TestSets[i]  = new DataSet(mapping,label_mapping, dsTests.toArray(new DataPoint[dsTests.size()]));
+		    //   	}
+
+		    //   	for (int i = 0; i < TrainSets.length; i++){
+		    //   		System.out.println(i);
+		    //   		AdaBoost boost = new AdaBoost(TrainSets[i], false);
+		    //   		results[i] += (double) boost.NLearners() / (double) runs;
+		    //   	}
+	    	// }
+	    	// for (int i = 0; i < tp.length; i++) {
+	    	// 	System.out.printf("%15f   ", tp[i]);
+	    	// }
+	    	// System.out.println();
+	    	// for (int i = 0; i < tp.length; i++) {
+	    	// 	System.out.printf("%15f   ", results[i]);
+	    	// }
+	    	// System.out.println();
+
+
+	    	// AdaBoost boost = new AdaBoost(training_dataset, print_verbose);
+    		// int[] output = boost.Classify(testing_dataset);
+
+    		// int right = 0;
+    		// int wrong = 0;
+    		// for (int i = 0; i < output.length; i++) {
+    		// 	if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
+    		// 		right++;
+    		// 	}
+    		// 	else {
+    		// 		wrong++;
+    		// 	}
+    		// }
+    		// System.out.println("Final AdaBoost Error Rate: " + ((double) wrong / (wrong + right)));
 	    }
     	if (decision_stump) {
     		double[] w = new double[training_dataset.NDataPoints()];
