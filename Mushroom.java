@@ -443,7 +443,7 @@ public class Mushroom {
 	    	}
 
 	    	int C_mag_min = -5;
-	    	int C_mag_max = 15;
+	    	int C_mag_max = 10;
 	    	double[] Cs = new double[C_mag_max - C_mag_min + 1];
 	    	System.out.printf("%15e    ", 9.999999999e99);
 	    	for (int i = 0; i < Cs.length; i++) {
