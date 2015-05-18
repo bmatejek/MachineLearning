@@ -104,9 +104,7 @@ public class AdaBoost implements Learner {
       }
       //System.out.printf("%15f\n", this.err);
       
-    }
-     //System.out.printf("Final training error:  %15f\n", this.err);
-    
+    }    
   }
 
   public int NLearners() {
