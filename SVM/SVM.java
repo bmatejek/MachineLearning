@@ -1,5 +1,21 @@
 package MachineLearning.SVM;
 
+/*****************************************************************************/
+/*                                                                           */
+/*  Theodore O. Brundage                                                     */
+/*  Brian Matejek                                                            */
+/*  COS 511, Theoretical Machine Learning, Professor Elad Hazan              */
+/*  Final Project, 5/17/15                                                   */
+/*                                                                           */
+/*  Description: This code implements the SVM learner. SVMs require numerical*/
+/*   data. Since the data used in our project are categorical, this          */
+/*   implementation uses the Binary data points. Also, we expect only data   */
+/*   two possible labels. Learning with more labels is expected to be handled*/
+/*   by the client.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 
@@ -21,7 +37,7 @@ public class SVM implements Learner {
   private int[][] X;  // Training set
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients
-  private int totalSteps = 1000000;
+  private int totalSteps = 1000000; // For tests capping the number of steps
 
 
   
@@ -46,7 +62,8 @@ public class SVM implements Learner {
     // Should this be initialized randomly with something nonzero?
     this.theta = new double[X[0].length]; 
     
-    // train on the DataSet 
+
+    // train on the DataSet if we are testing during training
     if (test != null) {
       int steps = 0;
       while (steps++ < totalSteps) {

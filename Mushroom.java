@@ -170,21 +170,6 @@ public class Mushroom {
 			for (int i = 0; i < mapping.length; i++) {
 				mapping[i] = mappingAL.get(i).toArray(new String[max]);
 			}
-			// for (int i = 0; i < mapping.length; i++) {
-			// 	for (int j = 0; j < mapping[0].length; j++) {
-			// 		System.out.print(mapping[i][j] + " ");
-			// 	}
-			// 	System.out.println();
-			// }
-			// for (int i = 0; i < symbols.size(); i++) {
-			// 	ArrayList<String> temp = symbols.get(i);
-			// 	for (int j = 0; j < temp.size(); j++) {
-			// 		System.out.print(temp.get(j) + " ");
-			// 	} 
-			// 	System.out.println();
-			// }
-			
-			
 
 		}
 
@@ -213,10 +198,7 @@ public class Mushroom {
 				}
 				DataPoint dp = new DataPoint(attribute, label, false);
 				dataSet.add(dp);
-				// System.out.println("\nDatapoint " + label_mapping[label]);
-				// for (int i = 0; i < attribute.length; i++) {
-				// 	System.out.println(mapping[i][attribute[i] + 1] + "  " + attribute[i]);
-				// }
+
 			}
 
 			// print out the level of noise
@@ -231,8 +213,7 @@ public class Mushroom {
       				dsTests.add(dataSet.get(i));
       			}
       		}
-			// List<DataPoint> dsTrain = dataSet.subList(0, (int) (training_proportion*dataSet.size())); 
-			// List<DataPoint> dsTests = dataSet.subList((int) (training_proportion*dataSet.size()), dataSet.size());
+	
 			DataPoint[] data_points_train = dsTrain.toArray(new DataPoint[dsTrain.size()]);
 			DataPoint[] data_points_tests = dsTests.toArray(new DataPoint[dsTests.size()]);
 			training_dataset = new DataSet(mapping, label_mapping, data_points_train);
@@ -300,16 +281,16 @@ public class Mushroom {
     			System.out.println();
     		}
 
-
+    		/* UNCOMMENT BELOW, and COMMENT ABOVE to switch TESTS */
     		// System.out.println("For Performance on Training Set, function of TP");
     		// double[] results = new double[tp.length];
     		// for (int n = 0; n < runs; n++) {
-	     //  		DataSet[] TrainSets = new DataSet[tp.length];
-	     //  		DataSet[] TestSets = new DataSet[tp.length];
+	        // 		DataSet[] TrainSets = new DataSet[tp.length];
+	        //  	DataSet[] TestSets = new DataSet[tp.length];
 	    	// 	for (int i = 0; i < tp.length; i++) {
 	    	// 		dsTrain = new ArrayList<DataPoint>();
-	     //  			dsTests = new ArrayList<DataPoint>();
-			   //  	for (int j = 0; j < dataSet.size(); j++) {
+	        //  		dsTests = new ArrayList<DataPoint>();
+			//  	for (int j = 0; j < dataSet.size(); j++) {
 		    //   			if (Math.random() < tp[i])
 		    //   				dsTrain.add(dataSet.get(j));
 		    //   			else {
@@ -371,7 +352,7 @@ public class Mushroom {
 		    			wrong++;
 		    		}
 		    	}
-		    	System.out.println(/*"Decision Stump Error Rate: " + */((double) wrong / (wrong + right)));
+		    	System.out.println("Decision Stump Error Rate: " + ((double) wrong / (wrong + right)));
 		    }
 	    }
 	    if (decision_tree) {}
@@ -396,22 +377,19 @@ public class Mushroom {
 	    }
 
 	    if (svmAlphaC) {
-	    	// int a_mag_min = -4;
-	    	// int a_mag_max = -3;
-	    	// double[] alphas = new double[(a_mag_max - a_mag_min + 1)];
-	    	// for (int i = 0; i < alphas.length; i++) {
-	    	// 	alphas[i] = Math.pow(10, a_mag_min + i);
-	    	// 	//alphas[2*i + 1] = 5 * Math.pow(10, a_mag_min + i);
-	    	// }
-	    	double[] alphas = {1.0e-8, 1.0e-6, 1.0e-4, 1.0e-2};
-
-	    	// int c_mag_min = -3;
-	    	// int c_mag_max = 3;
-	    	// double[] Cs = new double[(c_mag_max - c_mag_min + 1)];
-	    	// for (int i = 0; i < Cs.length; i++) {
-	    	// 	Cs[i] = Math.pow(10, c_mag_min + i);
-	    	// }
-	    	double[] Cs = {1.0e-9, 1.0e-5, 1.0e-2, 1.0, 1.0e2, 1.0e3, 1.0e5, 1.0e9};
+	    	int a_mag_min = -4;
+	    	int a_mag_max = -3;
+	    	double[] alphas = new double[(a_mag_max - a_mag_min + 1)];
+	    	for (int i = 0; i < alphas.length; i++) {
+	    		alphas[i] = Math.pow(10, a_mag_min + i);
+	    	}
+	    	
+	    	int c_mag_min = -3;
+	    	int c_mag_max = 3;
+	    	double[] Cs = new double[(c_mag_max - c_mag_min + 1)];
+	    	for (int i = 0; i < Cs.length; i++) {
+	    		Cs[i] = Math.pow(10, c_mag_min + i);
+	    	}
 
 	    	for (int i = 0; i < alphas.length; i++) {
 	    		for (int j = 0; j < Cs.length; j++) {
@@ -478,10 +456,6 @@ public class Mushroom {
 					}
 					trainingSets[i] = new DataSet(mapping, label_mapping, pts);
 				}
-
-
-		    	
-		    	//double[] Cs = {1.0e-6, 1.0, 1.0e6};
 
 		    	for (int i = 0; i < trainingSets.length; i++) {
 		    		System.out.printf("%15e    ", noise[i]);

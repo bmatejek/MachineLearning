@@ -1,5 +1,21 @@
 package MachineLearning.DecisionStump;
 
+/*****************************************************************************/
+/*                                                                           */
+/*  Theodore O. Brundage                                                     */
+/*  Brian Matejek                                                            */
+/*  COS 511, Theoretical Machine Learning, Professor Elad Hazan              */
+/*  Final Project, 5/17/15                                                   */
+/*                                                                           */
+/*  Description: This code implements the Decision Stumps. Generally, DSs can*/
+/*   handle binary, categorical, or numeric data. However, in the interest of*/
+/*   keeping this as simple and "weak" a learner as possible, we make it a   */
+/*   binary DS, and only use Binary DataPoints. Also, we expect only data    */
+/*   two possible labels. Learning with more labels is expected to be handled*/
+/*   by the client.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
 import MachineLearning.*;
 
 public class DecisionStump implements Learner {
@@ -68,59 +84,6 @@ public class DecisionStump implements Learner {
         decision_direction = 1;
       }
     }
-
-
-    // train on the DataSet
-    // Select Binary decision that is most effective
-    // double maxGain = Double.NEGATIVE_INFINITY;
-    // int maxGainIndex = -1;
-    // double p = 0;
-    // double n = 0;
-    // for (int i = 0; i < counts[0].length; i++) {
-    //   p += counts[p0][i] + counts[p1][i];
-    // }
-    // for (int i = 0; i < counts[0].length; i++) {
-    //   n += counts[n0][i] + counts[n1][i];
-    // }
-
-    // for (int i = 0; i < counts[0].length; i++) {
-    //   double remainder0 = ((double) counts[p0][i] + counts[n0][i]) / (p + n) 
-    //                         * B(counts[p0][i] / (counts[p0][i] + counts[n0][i]));
-    //   double remainder1 = ((double) counts[p1][i] + counts[n1][i]) / (p + n) 
-    //                         * B(counts[p1][i] / (counts[p1][i] + counts[n1][i]));
-    //   double gain = B(p / (p + n)) - remainder0 - remainder1;
-    //   if (gain > maxGain) {
-    //     maxGain = gain;
-    //     maxGainIndex = i;
-    //   }
-    // }
-    // this.decision_attribute = maxGainIndex;
-    // if (counts[p0][decision_attribute] + counts[n1][decision_attribute]
-    //      - counts[n0][decision_attribute] - counts[p1][decision_attribute] > 
-    //     counts[p1][decision_attribute] + counts[n0][decision_attribute]
-    //      - counts[p0][decision_attribute] - counts[n1][decision_attribute]) {
-    //   decision_direction = 0;
-    // }
-    // else {
-    //   decision_direction = 1;
-    // }
-    // if (Math.abs(counts[p0][maxGainIndex] - counts[n0][maxGainIndex])
-    //     > Math.abs(counts[p1][maxGainIndex] - counts[n1][maxGainIndex])) {
-    //   if (counts[p0][maxGainIndex] > counts[n0][maxGainIndex]) {
-    //     this.decision_direction = 0; // 0 attribute yields more 1 labels
-    //   }
-    //   else {
-    //     this.decision_direction = 1; // 0 attribute yields more 0 labels
-    //   }
-    // }
-    // else {
-    //   if (counts[p1][maxGainIndex] > counts[n1][maxGainIndex]) {
-    //     this.decision_direction = 1; // 1 attribute yields more 1 labels
-    //   }
-    //   else {
-    //     this.decision_direction = 0; // 1 attribute yields more 0 labels
-    //   }
-    // }
     
 
 
@@ -129,12 +92,6 @@ public class DecisionStump implements Learner {
       System.out.println("Instances with value " + this.decision_direction + " are labeled 1.");
     }
   }
-
-  // UNUSED FUNCTION - NO LONGER CALCULATING VIA ENTROPY
-  // private double B(double q) {
-  //   if (q == 0.0 || q == 1.0) return 0.0;
-  //   return -1.0 * (q * Math.log(q) + (1.0 - q) * Math.log(1.0 - q)) / Math.log(2.0);
-  // }
 
   // Hypothesis function for binary attribute vector x.
   private int h(int[] x) {
@@ -153,11 +110,6 @@ public class DecisionStump implements Learner {
       else {
         output[i] = 0;
       }
-      // int[] attributes = new int[dp.NAttributes()];
-      // for (int j = 0; j < attributes.length; j++) {
-      //   attributes[j] = dp.KthAttribute(j);
-      // }
-      // output[i] = h(attributes);
     }
     return output;
   }

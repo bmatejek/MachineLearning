@@ -1,5 +1,19 @@
 package MachineLearning.AdaBoost;
 
+/*****************************************************************************/
+/*                                                                           */
+/*  Theodore O. Brundage                                                     */
+/*  Brian Matejek                                                            */
+/*  COS 511, Theoretical Machine Learning, Professor Elad Hazan              */
+/*  Final Project, 5/17/15                                                   */
+/*                                                                           */
+/*  Description: This code implements the AdaBoost ensemble learner. While   */
+/*   AB can be used with any learner, we implement it here specifically with */
+/*   Decision Stumps.                                                        */
+/*                                                                           */
+/*****************************************************************************/
+
+
 import java.util.ArrayList;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -54,7 +68,8 @@ public class AdaBoost implements Learner {
       this.w[i] = val;
     }
 
-    // train on the DataSet
+    // train on the DataSet as long as we have not exceeded the max number of learners,
+    // or we have reached small enough error on the training set, or we run out of time.
     l  = new ArrayList<DecisionStump>();
     al = new ArrayList<Double>();
     missed = new boolean[this.labels.length];
@@ -97,6 +112,7 @@ public class AdaBoost implements Learner {
   public int NLearners() {
     return this.l.size();
   }
+
   // Returns error rate of a particular candidate for the current weights
   // of the test samples. Error rate is simply the sum of misclassified 
   // weights. 
@@ -122,11 +138,8 @@ public class AdaBoost implements Learner {
     for (int i = 0; i < predictions.length; i++) {
       if (predictions[i] != labels[i]) {
         errorWeight += w[i];
-       // missed[i] = true;
       }
-      // else {
-      //   missed[i] = false;
-      // }
+
     }
     if (this.print_verbose && errorWeight > this.err){
       System.out.printf("Increase in full hypothesis error rate from %f to %f\n", this.err, errorWeight);
@@ -134,32 +147,21 @@ public class AdaBoost implements Learner {
     this.err = errorWeight;
   }
   
-
+  // return WL coefficient given its performance error
   private double getAlpha(double error) {
     return 0.5 * Math.log((1 - error)/error);
   }
 
-  // private double getNorm() {
-  //   return 2.0 * Math.sqrt(this.err * (1.0 - this.err));
-  // }
-
+  // Adjust all weights, given the error of the most recently added WL
   private void updateWeights(double error) {
-    //double sum = 0.0;
     for (int i = 0; i < this.w.length; i++) {
       if (this.missed[i]) {
         w[i] = 0.5 * w[i] / error;
-        //w[i] *= Math.exp(al.get(al.size()-1)); 
-        //sum += w[i];
       }
       else {
         w[i] = 0.5 * w[i] / (1.0 - error);
-        //w[i] *= Math.exp(-1.0 * al.get(al.size()-1));
-        //sum += w[i];
       }
     }
-    // for (int i = 0; i < this.w.length; i++) {
-    //   w[i] /= sum;
-    // }
 
     if (print_verbose) {
       double total = 0.0;
