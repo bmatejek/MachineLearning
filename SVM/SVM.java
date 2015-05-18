@@ -8,6 +8,7 @@ import MachineLearning.*;
 
 public class SVM implements Learner {
 
+  private static boolean PRINT_VERBOSE_DEFAULT = false;
   private static double ALPHA_DEFAULT = 1.0e-4;
   private static double C_DEFAULT = 1.0;
 
@@ -20,12 +21,13 @@ public class SVM implements Learner {
   private int[][] X;  // Training set
   private int[] labels; // Training set labels
   private double[] theta; // Learned Coefficients
+  private int totalSteps = 1000000;
 
 
   
 
   // constructors for SVM
-  public SVM(DataSet train, boolean print_verbose, double a, double c) {
+  public SVM(DataSet train, boolean print_verbose, double a, double c, DataSet test) {
     this.print_verbose = print_verbose;
 
     this.alpha = a;
@@ -45,16 +47,48 @@ public class SVM implements Learner {
     this.theta = new double[X[0].length]; 
     
     // train on the DataSet 
-    Timer timer = new Timer(learning_time);
-    int run = 0;
-    while (run < convergence && timer.getTimeRemaining() >= 0) {
-      if (this.gradient_step() < this.eps) run++;
-      else run = 0;
+    if (test != null) {
+      int steps = 0;
+      while (steps++ < totalSteps) {
+          this.gradient_step();
+          if (steps % 10 == 0) {
+          int[] output = this.Classify(test);
+          int right = 0;
+          int wrong = 0;
+          for (int j = 0; j < output.length; j++) {
+            if (output[j] == test.KthBinaryDataPoint(j).Label()) {
+              right++;
+            }
+            else {
+              wrong++;
+            }
+          }
+          System.out.printf("%15d  %15f\n", steps, ((double) wrong / (wrong + right)));
+        }
+      }
     }
+    else {
+      Timer timer = new Timer(learning_time);
+      int run = 0;
+      int stp = 0;
+      while (run < convergence && timer.getTimeRemaining() >= 0) {
+        if (this.gradient_step() < this.eps) run++;
+        else run = 0;
+        stp++;
+      } 
+      System.out.println("Steps: " + stp);
+    }
+    
   }
 
+  public SVM(DataSet train, boolean print_verbose, double a, double c) {
+    this(train, print_verbose, a, c, null);
+  }
   public SVM(DataSet train, boolean print_verbose) { 
-    this(train, print_verbose, ALPHA_DEFAULT, C_DEFAULT);
+    this(train, print_verbose, ALPHA_DEFAULT, C_DEFAULT, null);
+  }
+  public SVM(DataSet train, DataSet test) {
+    this(train, PRINT_VERBOSE_DEFAULT, ALPHA_DEFAULT, C_DEFAULT, test);
   }
 
    
