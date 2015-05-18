@@ -241,6 +241,7 @@ public class Mushroom {
 				System.out.println("training_dataset size: " + training_dataset.NDataPoints());
 				System.out.println("testing_dataset size:  " + testing_dataset.NDataPoints());
 			}
+			System.out.println("binary attributes" + training_dataset.NBinaryAttributes());
 		}
 
 		catch (IOException e) {
@@ -351,32 +352,34 @@ public class Mushroom {
     		// System.out.println("Final AdaBoost Error Rate: " + ((double) wrong / (wrong + right)));
 	    }
     	if (decision_stump) {
-    		double[] w = new double[training_dataset.NDataPoints()];
-	    	double val = 1.0 / w.length;
-	    	for (int i = 0; i < w.length; i++) {
-	    		w[i] = val;
-	    	}
-	    	DecisionStump stump = new DecisionStump(training_dataset, w, print_verbose);
-	    	int[] output = stump.Classify(testing_dataset);
+    	    for (int z = 0; z < 1000; z++) {
+	    		double[] w = new double[training_dataset.NDataPoints()];
+		    	double val = 1.0 / w.length;
+		    	for (int i = 0; i < w.length; i++) {
+		    		w[i] = val;
+		    	}
+		    	DecisionStump stump = new DecisionStump(training_dataset, w, print_verbose);
+		    	int[] output = stump.Classify(testing_dataset);
 
-	    	int right = 0;
-	    	int wrong = 0;
-	    	for (int i = 0; i < output.length; i++) {
-	    		if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
-	    			right++;
-	    		}
-	    		else {
-	    			wrong++;
-	    		}
-	    	}
-	    	System.out.println("Decision Stump Error Rate: " + ((double) wrong / (wrong + right)));
+		    	int right = 0;
+		    	int wrong = 0;
+		    	for (int i = 0; i < output.length; i++) {
+		    		if (output[i] == testing_dataset.KthBinaryDataPoint(i).Label()) {
+		    			right++;
+		    		}
+		    		else {
+		    			wrong++;
+		    		}
+		    	}
+		    	System.out.println(/*"Decision Stump Error Rate: " + */((double) wrong / (wrong + right)));
+		    }
 	    }
 	    if (decision_tree) {}
 	    if (naive_bayes) {}
 	    if (neural_network) {}
 	    if (random_forest) {}
 	    if (svm) {
-	    	SVM svm = new SVM(training_dataset, print_verbose, 1.0e-3, 1.0e6);
+	    	SVM svm = new SVM(training_dataset, print_verbose, 1.0e-4, 1.0);
 	    	int[] output = svm.Classify(testing_dataset);
 
 	    	int right = 0;
